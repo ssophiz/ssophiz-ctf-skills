@@ -30,12 +30,12 @@ function Install-ProjectSkills {
 
     $skillNames = @(
         "web", "pwn", "reverse", "crypto",
-        "forensics", "malware", "misc", "orchestrator"
+        "forensics", "malware", "misc", "orchestrator",
+        "token-efficiency"
     )
     $targetRoots = @(
         (Join-Path $env:USERPROFILE ".agents\skills"),
-        (Join-Path $env:USERPROFILE ".claude\skills"),
-        (Join-Path $env:USERPROFILE ".codex\skills")
+        (Join-Path $env:USERPROFILE ".claude\skills")
     )
 
     foreach ($targetRoot in $targetRoots) {
@@ -64,8 +64,7 @@ function Install-ProjectSkills {
 function Install-BundledOrcaSkillsOffline {
     $targetRoots = @(
         (Join-Path $env:USERPROFILE ".agents\skills"),
-        (Join-Path $env:USERPROFILE ".claude\skills"),
-        (Join-Path $env:USERPROFILE ".codex\skills")
+        (Join-Path $env:USERPROFILE ".claude\skills")
     )
     foreach ($skillName in @("orca-cli", "orchestration")) {
         $markdown = (& orca skills get $skillName --full | Out-String)

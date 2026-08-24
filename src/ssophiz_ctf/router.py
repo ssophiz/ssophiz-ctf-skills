@@ -58,3 +58,9 @@ def route_task(task: TaskEnvelope, config: HarnessConfig) -> list[dict[str, Any]
             }
         )
     return assignments
+
+
+def select_wave(assignments: list[dict[str, Any]], wave: int) -> list[dict[str, Any]]:
+    if wave < 0:
+        raise ValueError("wave must be non-negative")
+    return [assignment for assignment in assignments if int(assignment.get("wave", 0)) == wave]

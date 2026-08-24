@@ -20,7 +20,7 @@ from .ctfd import CTFdClient
 from .evidence_report import build_evidence_pdf
 from .hwpx import extract_hwpx_text
 from .orca_runtime import OrcaRuntime, build_orca_plan
-from .router import infer_category, route_task
+from .router import infer_category, route_task, select_wave
 from .state import StateStore
 
 
@@ -265,13 +265,19 @@ def command_plan(args: argparse.Namespace) -> int:
     finally:
         store.close()
     assignments = route_task(task, config)
-    commands = build_orca_plan(task, assignments, str(config.data["orca"]["executable"]))
+    wave = int(getattr(args, "wave", 0))
+    selected = select_wave(assignments, wave)
+    if not selected:
+        raise ValueError(f"No worker profiles are configured for wave {wave}")
+    commands = build_orca_plan(task, selected, str(config.data["orca"]["executable"]))
     _json(
         {
             "task": task.to_dict(),
-            "assignments": assignments,
+            "wave": wave,
+            "assignments": selected,
+            "available_waves": sorted({int(item["wave"]) for item in assignments}),
             "orca_commands": [{"purpose": item.purpose, "argv": item.argv} for item in commands],
-            "note": "Each Orca specialist receives a distinct Orca task. API/Ollama reviewers start only with --with-api-workers.",
+            "note": "Wave 0 starts one medium-effort Codex worker. Use wave 1 only for a recorded blocker and wave 2 only for an independent Claude review.",
         }
     )
     return 0
@@ -414,11 +420,15 @@ def command_dispatch(args: argparse.Namespace) -> int:
         task = store.get_task(args.task_id)
     finally:
         store.close()
-    assignments = route_task(task, config)
+    all_assignments = route_task(task, config)
+    wave = int(args.wave)
+    assignments = select_wave(all_assignments, wave)
+    if not assignments:
+        raise ValueError(f"No worker profiles are configured for wave {wave}")
     if not args.apply:
         return command_plan(args)
     runtime = OrcaRuntime(str(config.data["orca"]["executable"]))
-    run_receipt = runtime.create_run(f"Solve and validate: {task.name}")
+    run_receipt = runtime.create_run(f"Solve and validate wave {wave}: {task.name}")
     worker_receipts: list[dict[str, Any]] = []
     external_receipts: list[dict[str, Any]] = []
     worker_start_failed = False
@@ -442,7 +452,7 @@ def command_dispatch(args: argparse.Namespace) -> int:
                 continue
             receipt = _spawn_provider(task, config, str(assignment["profile"]), "explicit parallel reviewer")
             external_receipts.append({"assignment": assignment, **receipt})
-    _json({"run": run_receipt, "workers": worker_receipts, "external_workers": external_receipts})
+    _json({"wave": wave, "run": run_receipt, "workers": worker_receipts, "external_workers": external_receipts})
     return 1 if worker_start_failed else 0
 
 
@@ -619,11 +629,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     plan = sub.add_parser("plan", help="Compile a task into worker assignments")
     plan.add_argument("task_id")
+    plan.add_argument("--wave", type=int, choices=(0, 1, 2), default=0, help="Plan one staged worker wave; default: 0")
     plan.set_defaults(func=command_plan)
 
-    dispatch = sub.add_parser("dispatch", help="Create an Orca run and start every configured Orca specialist")
+    dispatch = sub.add_parser("dispatch", help="Create an Orca run and start one staged worker wave")
     dispatch.add_argument("task_id")
     dispatch.add_argument("--apply", action="store_true", help="Actually create the Orca run and workers")
+    dispatch.add_argument("--wave", type=int, choices=(0, 1, 2), default=0, help="0=medium Codex, 1=xhigh Codex, 2=Claude review")
     dispatch.add_argument("--with-api-workers", action="store_true", help="Also start configured API/Ollama workers; this can consume provider credits")
     dispatch.set_defaults(func=command_dispatch)
 

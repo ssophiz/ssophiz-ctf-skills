@@ -11,5 +11,30 @@
     "source": "https://github.com/Graphify-Labs/graphify",
     "commit": "b2cd36267456c166788c95be6e68574064a92a42",
     "install": "uv-tool"
+  },
+  "headroom": {
+    "package": "headroom-ai",
+    "version": "0.36.5",
+    "source": "https://github.com/headroomlabs-ai/headroom",
+    "commit": "b9d7dcc3da3ec67a968d0ac1e35bffba9b7cf1c2",
+    "install": "isolated-venv-explicit-wrapper"
+  },
+  "codeburn": {
+    "package": "codeburn",
+    "version": "0.9.20",
+    "source": "https://github.com/getagentseal/codeburn",
+    "commit": "e5e6e5931795f2f130299901410464a66289767a",
+    "install": "npm-global"
+  },
+  "caveman": {
+    "source": "https://github.com/JuliusBrussee/caveman",
+    "commit": "7bb71309e8749a4f112aacd3a54b3941d8689905",
+    "install": "skill-only-no-proxy-hooks"
+  },
+  "impeccable": {
+    "version": "4.1.1",
+    "source": "https://github.com/pbakaus/impeccable",
+    "commit": "c3a30086bc395ea2197fbe287dc59c18969aaeb6",
+    "install": "on-demand-ui-skill"
   }
 }

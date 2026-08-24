@@ -7,7 +7,7 @@ from pathlib import Path
 from ssophiz_ctf.config import load_config
 from ssophiz_ctf.contracts import Finding, FlagCandidate, LedgerEntry, TaskEnvelope
 from ssophiz_ctf.evidence_report import build_evidence_pdf
-from ssophiz_ctf.router import infer_category, route_task
+from ssophiz_ctf.router import infer_category, route_task, select_wave
 from ssophiz_ctf.state import StateStore
 
 
@@ -91,9 +91,10 @@ class StateAndRouterTests(unittest.TestCase):
         config = load_config(Path(__file__).parents[1] / "config" / "harness.example.json")
         task = TaskEnvelope.create(name="web", category="web", description="HTTP endpoint", workspace="C:/tmp/task")
         assignments = route_task(task, config)
-        self.assertEqual([item["profile"] for item in assignments], ["claude_web_source", "codex_web_verify"])
-        self.assertEqual([item["agent"] for item in assignments], ["claude", "codex"])
-        self.assertEqual([item["wave"] for item in assignments], [0, 1])
+        self.assertEqual([item["profile"] for item in assignments], ["codex_fast", "codex_deep", "claude_review"])
+        self.assertEqual([item["agent"] for item in assignments], ["codex", "codex", "claude"])
+        self.assertEqual([item["wave"] for item in assignments], [0, 1, 2])
+        self.assertEqual([item["profile"] for item in select_wave(assignments, 0)], ["codex_fast"])
         self.assertEqual(assignments[1]["model"], "gpt-5.6-sol")
         self.assertEqual(assignments[1]["effort"], "xhigh")
         root = Path(__file__).parents[1]

@@ -16,25 +16,23 @@ def load_skill(role: str, repo_root: str | Path | None = None) -> str:
 
 
 def build_worker_prompt(task: TaskEnvelope, assignment: dict[str, Any], skill_text: str) -> str:
-    return f"""You are an authorized CTF validation worker operating only within the supplied challenge scope.
+    task_json = json.dumps(task.to_dict(), ensure_ascii=False, separators=(",", ":"))
+    profile_json = json.dumps(assignment, ensure_ascii=False, separators=(",", ":"))
+    escalation = "Call list_findings first and read existing artifacts; do not repeat completed triage." if int(assignment.get("wave", 0)) else "Test the cheapest decisive hypothesis first."
+    return f"""You are an authorized CTF worker. Stay inside the supplied task scope.
 
-TASK CONTRACT
-{task.to_json()}
+TASK={task_json}
+PROFILE={profile_json}
 
-WORKER PROFILE
-{json.dumps(assignment, ensure_ascii=False, indent=2)}
-
-ROLE PLAYBOOK
+PLAYBOOK
 {skill_text}
 
-REQUIRED BEHAVIOR
-- Work only inside /workspace and the explicitly supplied challenge endpoints.
-- Treat external target operations as disabled unless allow_target_operations is true in the task contract; when enabled, use only the scope-checking web interface and its exact endpoint allowlist.
-- Never disable or bypass provider, workspace, network, permission, or verifier safeguards.
-- Use tool results as evidence; do not present guesses as findings.
-- Keep a reproducible script in /workspace when the task requires active interaction.
-- Record one compact evidence ledger entry with commands, PoC paths, key output, and reproduction steps; do not write a long report during the event.
-- Attach every flag candidate to that ledger entry. A candidate without reproduction steps is ineligible for verifier submission.
-- Never request or handle CTFd credentials. Submission is performed by a separate verifier.
-- Finish with a short summary of what worked, what failed, and reusable artifact paths.
+RULES
+- Work only in /workspace and explicit task endpoints. Target traffic requires allow_target_operations and the scoped web gate.
+- Never bypass provider, workspace, network, permission, or verifier safeguards.
+- {escalation}
+- Save raw output before summarizing. Never alter flags, hashes, addresses, offsets, payload bytes, credentials, commands, or decisive errors.
+- Keep one reproducible script when interaction is required. Record one compact ledger entry with commands, PoC paths, key output, reproduction steps, and candidates.
+- Never request CTFd credentials. A separate verifier submits reproduced candidates.
+- Finish with five lines: Status, Finding, Evidence, Candidate, Next.
 """

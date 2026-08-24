@@ -26,16 +26,18 @@ challenge answers.
 
 ## Optional context-efficiency tools
 
-Ponytail and Graphify can be installed reproducibly for Codex and this project:
+Ponytail, Graphify, Headroom, CodeBurn, Caveman, and Impeccable can be installed
+reproducibly for Codex, Claude Code, and this project:
 
 ```powershell
 .\scripts\install-agent-efficiency-tools.ps1
 ```
 
-Ponytail discourages unnecessary implementation and Graphify provides a local
-AST-backed project graph that can be queried before reading many files. See
-[docs/AGENT_EFFICIENCY.md](docs/AGENT_EFFICIENCY.md) for activation, privacy,
-and token-measurement guidance. Pinned source versions are recorded in
+Headroom remains opt-in through the supplied launch scripts; the installer does
+not rewrite an active Codex or Claude session. CodeBurn measures usage. Caveman
+is installed as a skill without its proxy hooks, and Impeccable is reserved for
+UI work. See [docs/AGENT_EFFICIENCY.md](docs/AGENT_EFFICIENCY.md) for routing,
+privacy, and token-measurement guidance. Pinned source versions are recorded in
 [config/agent-tools.lock.json](config/agent-tools.lock.json).
 
 ## Live evidence ledger
@@ -105,16 +107,15 @@ ENKI WhiteHat 스타일의 승인된 CTF 문제를 여러 모델이 분석하고
 CTFd / 수동 입력
        │
        ▼
-  TaskEnvelope ──► category router ──► Orca wave 0 (Codex)
-       │                                  │
-       │                                  ├─ pwn / reverse / web skill
-       │                                  └─ evidence + candidate
-       │
-       └────────────────────────────► wave 1 API worker
-                                          DeepSeek / Kimi / Grok
+  TaskEnvelope ──► category router ──► wave 0: Codex medium
+                                          │
+                                          ├─ evidence or candidate ──► stop
+                                          └─ concrete blocker
                                                   │
                                                   ▼
-                                     Docker isolated tool loop
+                                     wave 1: Codex xhigh
+                                                  │
+                                                  └─ optional wave 2: Claude review
 
 findings / candidates ──► SQLite control plane ──► verifier-only CTFd submit
 ```
@@ -156,27 +157,17 @@ CTFd API token이 있는 경우에는 설명·카테고리를 등록합니다. �
 $env:SSOPHIZ_CTFD_URL = "https://ctf.example"
 $env:SSOPHIZ_CTFD_TOKEN = "..."
 .\scripts\ctf-harness.ps1 ingest-ctfd 42 --download-attachments
-.\scripts\ctf-harness.ps1 dispatch <task_id> --apply --with-api-workers
+.\scripts\ctf-harness.ps1 dispatch <task_id> --apply
 ```
 
-Codex worker가 시작하지 못하면 설정된 중국계 fallback 순서에서 첫 번째 사용 가능한 provider를 자동 실행합니다. 실행 이후의 실패까지 감시하려면 Orca를 시작한 coordinator 터미널에서 supervisor를 계속 호출합니다.
+기본 dispatch는 medium effort Codex 워커 하나만 시작합니다. 재현 가능한 후보가 나오면 추가 워커를 시작하지 않습니다. 구체적인 blocker가 남았을 때만 wave 1을, 독립 계열 검토가 실제로 필요한 경우에만 wave 2를 실행합니다.
 
 ```powershell
-while ($true) { .\scripts\ctf-harness.ps1 supervise --timeout-seconds 60 }
+.\scripts\ctf-harness.ps1 dispatch <task_id> --apply --wave 1
+.\scripts\ctf-harness.ps1 dispatch <task_id> --apply --wave 2
 ```
 
-현재 fallback 우선순위는 Kimi K3 → DeepSeek → 로컬 Ollama입니다. 이 선택은 2026-08 시점 독립 벤치마크의 중국계 모델군 순위를 기준으로 하되, 실제 Kimi API model ID와 reasoning tier는 사용하는 계정의 최신 문서에 맞춰야 합니다. API key와 Docker worker image가 실제로 준비된 provider만 선택됩니다. 수동 전환은 `.\scripts\ctf-harness.ps1 rescue <task_id>`입니다.
-
-`dispatch --apply`는 분야별 Codex 전문 워커를 각각 별도 Orca task로 동시에 시작합니다. API/Ollama 독립 검증자도 함께 시작하려면 비용·키 사용을 명시하는 `--with-api-workers`를 붙입니다.
-
-```powershell
-.\scripts\ctf-harness.ps1 dispatch <task_id> --apply --with-api-workers
-```
-
-```powershell
-$env:DEEPSEEK_API_KEY = "..."
-.\scripts\ctf-harness.ps1 provider-run <task_id> --profile deepseek_exploit
-```
+DeepSeek, Kimi, Grok profile과 자동 fallback은 기본 구성에서 제거했습니다. 일반 OpenAI-compatible adapter는 사설 또는 별도 승인 provider를 수동 연결할 수 있도록 확장 지점으로만 남아 있습니다.
 
 Ollama는 선택적인 로컬 검산 worker입니다. `ollama pull qwen3:14b` 후 API key 없이 실행할 수 있습니다.
 
@@ -184,7 +175,7 @@ Ollama는 선택적인 로컬 검산 worker입니다. `ollama pull qwen3:14b` �
 .\scripts\ctf-harness.ps1 provider-run <task_id> --profile ollama_local
 ```
 
-기본 route에서는 Misc 2차 검산에만 넣었습니다. 16GB VRAM 환경에서는 Pwn 주력 모델로 과신하지 말고, 디컴파일 요약·구조체 가설 검산·로그 교차검증처럼 병렬 가치가 큰 작업에 쓰는 편이 낫습니다.
+Ollama는 기본 route에 포함되지 않습니다. 16GB VRAM 환경에서는 Pwn 주력 모델로 과신하지 말고, 디컴파일 요약·구조체 가설 검산·로그 교차검증처럼 병렬 가치가 큰 작업에만 수동 사용합니다.
 
 후보를 검토한 다음에만 CTFd로 제출합니다.
 
@@ -214,15 +205,15 @@ codex mcp add ctf-control -- ctf-control-mcp
 
 ## 모델 배치
 
-기본값은 강한 Codex 워커를 wave 0에 두고, 서로 다른 계열 모델을 wave 1 독립 검증자로 둡니다.
+기본값은 한 문제에 한 워커입니다. 증거가 없는 막힘이 확인될 때만 다음 wave를 시작합니다.
 
-| 분야 | wave 0 | wave 1 | 핵심 도구 |
+| 단계 | 모델 | 시작 조건 | 목적 |
 |---|---|---|---|
-| Pwn | Codex Sol | DeepSeek | pwntools, gdb, checksec, ROPgadget |
-| Reverse | Codex Sol | Kimi | Ghidra headless, radare2, gdb, angr |
-| Web | Codex Terra | Grok | curl, Chromium, mitmproxy, nuclei templates |
+| wave 0 | Codex, medium | 항상 | 분류, 알려진 패턴, 기계적 추출, 첫 PoC |
+| wave 1 | Codex, xhigh | 구체적 blocker | 경쟁 가설, exploit 구성, 교차 분야 추론 |
+| wave 2 | Claude, high | 독립 계열 검토가 필요한 경우 | 핵심 가정 하나만 반증 또는 확인 |
 
-모델·API 이름은 공급자 변경이 잦으므로 [config/harness.example.json](config/harness.example.json)에서 실제 계정에 맞게 수정해야 합니다. 외부 모델에 보내면 안 되는 문제는 해당 profile을 route에서 제거하십시오.
+분야별 SKILL.md는 그대로 사용하므로 Pwn, Reverse, Web 등 전문 지침은 유지됩니다. 후속 wave는 `list_findings`와 기존 작업물을 먼저 읽고 완료된 triage를 반복하지 않습니다.
 
 ## 개발 검증
 

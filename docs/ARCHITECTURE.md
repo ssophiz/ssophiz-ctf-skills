@@ -3,13 +3,13 @@
 ## 책임 분리
 
 1. `ctf-harness`가 CTFd 또는 로컬 파일을 `TaskEnvelope`로 정규화합니다.
-2. router가 분야별 profile을 병렬 specialist와 독립 검증자로 배치합니다.
-3. Orca는 Codex specialist마다 별도 run task/worker를 생성하고 상태를 추적합니다.
-4. API adapter는 명시적 `--with-api-workers`에서만 OpenAI-compatible provider를 Docker 도구 루프에 연결합니다.
+2. router가 분야별 playbook을 유지하면서 worker profile을 세 단계 wave로 배치합니다.
+3. Orca는 선택한 wave의 worker 하나만 별도 run task로 생성하고 상태를 추적합니다.
+4. wave 0은 medium Codex, wave 1은 blocker용 xhigh Codex, wave 2는 선택적 Claude 검토입니다.
 5. 모든 워커는 finding과 flag candidate만 control plane에 게시합니다.
 6. verifier가 CTFd 토큰을 보유하고 후보를 단일 제출합니다.
 
-Codex launch 실패는 dispatch가 즉시 fallback route로 넘깁니다. 실행 후 `worker_done: failed`는 `ctf-harness supervise`가 처리하며, 실패한 worker의 category에 맞춰 Kimi/DeepSeek/Ollama 중 준비된 첫 provider를 실행합니다. Provider API key와 Docker image가 없으면 failover를 성공으로 가장하지 않고 unavailable receipt를 반환합니다.
+DeepSeek, Kimi, Grok 기본 profile과 자동 provider fallback은 제거했습니다. 실패는 명시적으로 기록하고, coordinator가 같은 wave 재시도 또는 다음 wave 실행 중 하나를 선택합니다. 로컬 Ollama와 일반 OpenAI-compatible adapter는 기본 route 밖의 수동 확장 지점으로만 남습니다.
 
 ## 상태 계약
 
@@ -28,7 +28,7 @@ IDA Pro는 라이선스와 GUI 세션 때문에 worker image에 포함하지 않
 
 ## 확장 지점
 
-- 새 provider: `profiles`에 `openai_compatible` profile 추가
+- 새 provider: 데이터 경계를 검토한 뒤 `profiles`에 수동 `openai_compatible` profile 추가
 - 새 분야: `contracts.CATEGORIES`, router 키워드, `skills/<role>/SKILL.md`, route 추가
 - 새 도구: API worker tool schema와 `_execute_tool` 양쪽에 추가
 - CTF 플랫폼: CTFdClient와 같은 verifier adapter 구현
