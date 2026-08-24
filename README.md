@@ -24,6 +24,20 @@ The sanitized [CCE 2026 retrospective](docs/CCE2026_POSTMORTEM.md) records the
 operational lessons used to strengthen these skills without publishing any
 challenge answers.
 
+## Optional context-efficiency tools
+
+Ponytail and Graphify can be installed reproducibly for Codex and this project:
+
+```powershell
+.\scripts\install-agent-efficiency-tools.ps1
+```
+
+Ponytail discourages unnecessary implementation and Graphify provides a local
+AST-backed project graph that can be queried before reading many files. See
+[docs/AGENT_EFFICIENCY.md](docs/AGENT_EFFICIENCY.md) for activation, privacy,
+and token-measurement guidance. Pinned source versions are recorded in
+[config/agent-tools.lock.json](config/agent-tools.lock.json).
+
 ## Live evidence ledger
 
 Solver workers can preserve decisive commands, PoC paths, key output, flag

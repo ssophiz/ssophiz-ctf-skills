@@ -15,6 +15,7 @@ build/
 .codex/
 .agents/
 .mcp.local.json
+graphify-out/
 
 # Event workspaces and generated evidence
 analysis/

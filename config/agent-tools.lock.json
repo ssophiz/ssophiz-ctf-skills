@@ -1,0 +1,15 @@
+{
+  "ponytail": {
+    "version": "4.9.0",
+    "source": "https://github.com/DietrichGebert/ponytail",
+    "commit": "2ed6c52c9d7e5e56942508591085fd45dea277d3",
+    "install": "codex-plugin"
+  },
+  "graphify": {
+    "package": "graphifyy",
+    "version": "0.9.48",
+    "source": "https://github.com/Graphify-Labs/graphify",
+    "commit": "b2cd36267456c166788c95be6e68574064a92a42",
+    "install": "uv-tool"
+  }
+}
