@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ssophiz-ctf-harness"
+version = "0.1.0"
+description = "Orca-backed, multi-model CTF validation harness"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "itsdangerous>=2.2,<3",
+  "mcp>=1.27,<2",
+  "reportlab>=4.2,<5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+
+[project.scripts]
+ctf-harness = "ssophiz_ctf.cli:main"
+ctf-harness-mcp = "ssophiz_ctf.mcp_control:main"
+ctf-control-mcp = "ssophiz_ctf.mcp_control:main"
+ctf-artifact-mcp = "ssophiz_ctf.mcp_artifact:main"
+ctf-sandbox-mcp = "ssophiz_ctf.mcp_sandbox:main"
+ctf-ida-mcp = "ssophiz_ctf.mcp_ida:main"
+ctf-web-mcp = "ssophiz_ctf.mcp_web:main"
+ctf-verifier-mcp = "ssophiz_ctf.mcp_verifier:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

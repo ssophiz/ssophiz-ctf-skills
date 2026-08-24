@@ -1,0 +1,39 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.env
+config/harness.json
+.harness/
+dist/
+build/
+*.egg-info/
+
+# Local agent state and credentials
+.claude/
+.codex/
+.agents/
+.mcp.local.json
+
+# Event workspaces and generated evidence
+analysis/
+claude_final_audits/
+examples/
+output/
+tmp/
+work/
+prepared/
+*.log
+*.core
+core
+core.*
+.gdb_history
+luac.out
+tmp_*.png
+
+# Editor and operating-system state
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

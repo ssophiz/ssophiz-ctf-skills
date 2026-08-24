@@ -1,0 +1,152 @@
+{
+  "runtime": {
+    "state_db": ".harness/state.db",
+    "workspace_root": ".harness/workspaces",
+    "worker_image": "ssophiz-ctf-worker:latest",
+    "worker_network": "none",
+    "max_parallel": 8,
+    "default_timeout_minutes": 12
+  },
+  "orca": {
+    "executable": "orca",
+    "enabled": true
+  },
+  "ctfd": {
+    "base_url": "${SSOPHIZ_CTFD_URL}",
+    "token_env": "SSOPHIZ_CTFD_TOKEN"
+  },
+  "profiles": {
+    "codex_pwn_triage": {
+      "adapter": "orca",
+      "agent": "codex",
+      "model": "gpt-5.6-sol",
+      "effort": "xhigh",
+      "role": "pwn",
+      "wave": 0,
+      "focus": "Perform independent static and dynamic triage: mitigations, input surface, crash reproducibility, and artifact inventory. Publish a concise evidence-backed handoff."
+    },
+    "codex_pwn_exploit": {
+      "adapter": "orca",
+      "agent": "codex",
+      "model": "gpt-5.6-sol",
+      "effort": "xhigh",
+      "role": "pwn",
+      "wave": 0,
+      "focus": "Independently develop and reproduce the exploit path. Do not rely on another worker's conclusion without verification."
+    },
+    "codex_reverse_static": {
+      "adapter": "orca",
+      "agent": "codex",
+      "model": "gpt-5.6-sol",
+      "effort": "xhigh",
+      "role": "reverse",
+      "wave": 0,
+      "focus": "Map binary format, key functions, constants, and data structures with static analysis. Produce an evidence-backed function map."
+    },
+    "codex_reverse_dynamic": {
+      "adapter": "orca",
+      "agent": "codex",
+      "model": "gpt-5.6-sol",
+      "effort": "xhigh",
+      "role": "reverse",
+      "wave": 0,
+      "focus": "Validate the program's checks and transformations with bounded dynamic analysis, then build a reproducible solver or key recovery script."
+    },
+    "codex_malware_static": {
+      "adapter": "orca",
+      "agent": "codex",
+      "model": "gpt-5.6-sol",
+      "effort": "xhigh",
+      "role": "malware",
+      "wave": 0,
+      "focus": "Perform contained static malware triage, map behavior and configuration, and extract indicators without contacting them."
+    },
+    "codex_malware_dynamic": {
+      "adapter": "orca",
+      "agent": "codex",
+      "model": "gpt-5.6-sol",
+      "effort": "xhigh",
+      "role": "malware",
+      "wave": 0,
+      "focus": "Use bounded emulation or debugger-controlled execution with network disabled to validate configuration decoding and behavior."
+    },
+    "claude_web_source": {
+      "adapter": "orca",
+      "agent": "claude",
+      "model": "opus",
+      "effort": "high",
+      "role": "web",
+      "wave": 0,
+      "focus": "Analyze only the supplied source and artifacts: routes, trust boundaries, session/token handling, and configuration. Publish concrete source-to-request hypotheses without contacting a target or disabling provider safeguards."
+    },
+    "codex_web_verify": {
+      "adapter": "orca",
+      "agent": "codex",
+      "model": "gpt-5.6-sol",
+      "effort": "xhigh",
+      "role": "web",
+      "wave": 1,
+      "focus": "Independently verify the source-analysis claims and save a minimal reproducer. Contact only task endpoints when allow_target_operations is true and the scoped ctf-web gate is explicitly enabled; never bypass provider or permission safeguards."
+    },
+    "deepseek_exploit": {
+      "adapter": "openai_compatible",
+      "base_url": "https://api.deepseek.com",
+      "api_key_env": "DEEPSEEK_API_KEY",
+      "model": "deepseek-chat",
+      "role": "pwn",
+      "wave": 1,
+      "focus": "Act as an independent exploit reviewer. Challenge the primary exploit hypothesis and reproduce it before publishing a candidate.",
+      "max_turns": 30
+    },
+    "kimi_k3": {
+      "adapter": "openai_compatible",
+      "base_url": "https://api.moonshot.cn/v1",
+      "api_key_env": "KIMI_API_KEY",
+      "model": "kimi-k3",
+      "role": "reverse",
+      "wave": 1,
+      "focus": "Independently recover the central algorithm or data structure and verify any proposed key or solver output.",
+      "max_turns": 30
+    },
+    "grok_web": {
+      "adapter": "openai_compatible",
+      "base_url": "https://api.x.ai/v1",
+      "api_key_env": "GROK_API_KEY",
+      "model": "grok-4.5",
+      "role": "web",
+      "wave": 1,
+      "focus": "Independently validate the web attack chain and seek a distinct route if the primary path is inconclusive.",
+      "max_turns": 24
+    },
+    "ollama_local": {
+      "adapter": "ollama",
+      "base_url": "http://127.0.0.1:11434/v1",
+      "model": "qwen3:14b",
+      "role": "reverse",
+      "wave": 1,
+      "focus": "Perform a local independent review of decompilation notes, structures, and solver output.",
+      "max_turns": 20
+    }
+  },
+  "routes": {
+    "pwn": ["codex_pwn_triage", "codex_pwn_exploit"],
+    "reverse": ["codex_reverse_static", "codex_reverse_dynamic"],
+    "malware": ["codex_malware_static", "codex_malware_dynamic"],
+    "web": ["claude_web_source", "codex_web_verify"],
+    "crypto": ["codex_pwn_triage", "codex_pwn_exploit"],
+    "forensics": ["codex_reverse_static", "codex_reverse_dynamic"],
+    "misc": ["claude_web_source", "codex_web_verify"]
+  },
+  "failover": {
+    "enabled": false,
+    "routes": {}
+  },
+  "mcp_roles": {
+    "orchestrator": ["ctf-control", "ctf-artifact", "ctf-web"],
+    "pwn": ["ctf-control", "ctf-artifact", "ctf-sandbox", "ctf-ida"],
+    "reverse": ["ctf-control", "ctf-artifact", "ctf-sandbox", "ctf-ida", "search"],
+    "malware": ["ctf-control", "ctf-artifact", "ctf-sandbox", "ctf-ida", "search"],
+    "web": ["ctf-control", "ctf-artifact", "ctf-sandbox", "ctf-web"],
+    "verifier": ["ctf-verifier"]
+  }
+}

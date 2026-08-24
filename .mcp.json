@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "ctf-control": {
+      "command": "scripts\\project-venv-python.cmd",
+      "args": ["-m", "ssophiz_ctf.mcp_control"],
+      "env": {
+        "SSOPHIZ_CONFIG": "config/harness.json"
+      }
+    },
+    "ctf-artifact": {
+      "command": "scripts\\project-venv-python.cmd",
+      "args": ["-m", "ssophiz_ctf.mcp_artifact"],
+      "env": {
+        "SSOPHIZ_CONFIG": "config/harness.json"
+      }
+    },
+    "ctf-sandbox": {
+      "command": "scripts\\project-venv-python.cmd",
+      "args": ["-m", "ssophiz_ctf.mcp_sandbox"],
+      "env": {
+        "SSOPHIZ_CONFIG": "config/harness.json"
+      }
+    },
+    "ctf-ida": {
+      "command": "scripts\\project-venv-python.cmd",
+      "args": ["-m", "ssophiz_ctf.mcp_ida"],
+      "env": {
+        "SSOPHIZ_CONFIG": "config/harness.json"
+      }
+    },
+    "ctf-web": {
+      "command": "scripts\\project-venv-python.cmd",
+      "args": ["-m", "ssophiz_ctf.mcp_web"],
+      "env": {
+        "SSOPHIZ_CONFIG": "config/harness.json"
+      }
+    }
+  }
+}
