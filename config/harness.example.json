@@ -16,29 +16,29 @@
     "token_env": "SSOPHIZ_CTFD_TOKEN"
   },
   "profiles": {
+    "codex_triage": {
+      "adapter": "orca",
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "effort": "low",
+      "wave": 0,
+      "focus": "Classify the supplied task and run at most three cheap decisive checks. Prefer metadata, known patterns, strings, imports, routes, and one mechanical extraction. Stop with QUICK, SOLVE, HARD, or BLOCKED plus one compact handoff."
+    },
     "codex_fast": {
       "adapter": "orca",
       "agent": "codex",
       "model": "gpt-5.6-sol",
       "effort": "medium",
-      "wave": 0,
-      "focus": "Triage the supplied task using the category playbook. Test known patterns and mechanical extraction first, save raw evidence, and publish one compact handoff. Stop after a reproducible candidate or one concrete blocker."
+      "wave": 1,
+      "focus": "Primary solver. Read the triage finding and artifacts first, pursue only the selected path, and save a minimal reproducible solver or one concrete blocker."
     },
     "codex_deep": {
       "adapter": "orca",
       "agent": "codex",
       "model": "gpt-5.6-sol",
       "effort": "xhigh",
-      "wave": 1,
-      "focus": "Escalation worker. Read existing findings and artifacts before acting, resolve the recorded blocker, and avoid repeating completed triage. Build a minimal reproducible solver or exploit."
-    },
-    "claude_review": {
-      "adapter": "orca",
-      "agent": "claude",
-      "model": "opus",
-      "effort": "high",
       "wave": 2,
-      "focus": "Optional independent reviewer. Read the existing evidence, challenge only the load-bearing assumption, and return a distinct bounded experiment or a concise confirmation."
+      "focus": "Escalation worker. Read existing findings and artifacts before acting, resolve the recorded blocker, and avoid repeating completed triage. Build a minimal reproducible solver or exploit."
     },
     "ollama_local": {
       "adapter": "ollama",
@@ -51,13 +51,13 @@
     }
   },
   "routes": {
-    "pwn": ["codex_fast", "codex_deep", "claude_review"],
-    "reverse": ["codex_fast", "codex_deep", "claude_review"],
-    "malware": ["codex_fast", "codex_deep", "claude_review"],
-    "web": ["codex_fast", "codex_deep", "claude_review"],
-    "crypto": ["codex_fast", "codex_deep", "claude_review"],
-    "forensics": ["codex_fast", "codex_deep", "claude_review"],
-    "misc": ["codex_fast", "codex_deep", "claude_review"]
+    "pwn": ["codex_triage", "codex_fast", "codex_deep"],
+    "reverse": ["codex_triage", "codex_fast", "codex_deep"],
+    "malware": ["codex_triage", "codex_fast", "codex_deep"],
+    "web": ["codex_triage", "codex_fast", "codex_deep"],
+    "crypto": ["codex_triage", "codex_fast", "codex_deep"],
+    "forensics": ["codex_triage", "codex_fast", "codex_deep"],
+    "misc": ["codex_triage", "codex_fast", "codex_deep"]
   },
   "failover": {
     "enabled": false,

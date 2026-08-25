@@ -18,7 +18,12 @@ def load_skill(role: str, repo_root: str | Path | None = None) -> str:
 def build_worker_prompt(task: TaskEnvelope, assignment: dict[str, Any], skill_text: str) -> str:
     task_json = json.dumps(task.to_dict(), ensure_ascii=False, separators=(",", ":"))
     profile_json = json.dumps(assignment, ensure_ascii=False, separators=(",", ":"))
-    escalation = "Call list_findings first and read existing artifacts; do not repeat completed triage." if int(assignment.get("wave", 0)) else "Test the cheapest decisive hypothesis first."
+    wave = int(assignment.get("wave", 0))
+    escalation = (
+        "Classification pass only: run at most three cheap decisive checks, then publish QUICK, SOLVE, HARD, or BLOCKED."
+        if wave == 0
+        else "Call list_findings first and read existing artifacts; do not repeat completed triage."
+    )
     return f"""You are an authorized CTF worker. Stay inside the supplied task scope.
 
 TASK={task_json}

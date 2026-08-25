@@ -112,15 +112,15 @@ ENKI WhiteHat 스타일의 승인된 CTF 문제를 여러 모델이 분석하고
 CTFd / 수동 입력
        │
        ▼
-  TaskEnvelope ──► category router ──► wave 0: Codex medium
+  TaskEnvelope ──► category router ──► wave 0: Luna low triage
                                           │
                                           ├─ evidence or candidate ──► stop
                                           └─ concrete blocker
                                                   │
                                                   ▼
-                                     wave 1: Codex xhigh
+                                     wave 1: Sol medium solve
                                                   │
-                                                  └─ optional wave 2: Claude review
+                                                  └─ blocker wave 2: Sol xhigh
 
 findings / candidates ──► SQLite control plane ──► verifier-only CTFd submit
 ```
@@ -165,7 +165,7 @@ $env:SSOPHIZ_CTFD_TOKEN = "..."
 .\scripts\ctf-harness.ps1 dispatch <task_id> --apply
 ```
 
-기본 dispatch는 medium effort Codex 워커 하나만 시작합니다. 재현 가능한 후보가 나오면 추가 워커를 시작하지 않습니다. 구체적인 blocker가 남았을 때만 wave 1을, 독립 계열 검토가 실제로 필요한 경우에만 wave 2를 실행합니다.
+기본 dispatch는 Luna low 워커 하나로 최대 세 가지 값싼 검사를 수행합니다. 선택된 경로만 wave 1의 Sol medium으로 풀고, 구체적인 blocker가 남았을 때만 wave 2의 Sol xhigh를 실행합니다.
 
 ```powershell
 .\scripts\ctf-harness.ps1 dispatch <task_id> --apply --wave 1
@@ -214,9 +214,9 @@ codex mcp add ctf-control -- ctf-control-mcp
 
 | 단계 | 모델 | 시작 조건 | 목적 |
 |---|---|---|---|
-| wave 0 | Codex, medium | 항상 | 분류, 알려진 패턴, 기계적 추출, 첫 PoC |
-| wave 1 | Codex, xhigh | 구체적 blocker | 경쟁 가설, exploit 구성, 교차 분야 추론 |
-| wave 2 | Claude, high | 독립 계열 검토가 필요한 경우 | 핵심 가정 하나만 반증 또는 확인 |
+| wave 0 | Luna, low | 항상 | 최대 세 가지 값싼 검사와 난이도·경로 분류 |
+| wave 1 | Sol, medium | QUICK/SOLVE 판정 | 선택된 경로의 최소 PoC와 플래그 회수 |
+| wave 2 | Sol, xhigh | 구체적 blocker | exploit 구성, 교차 분야 추론, 난제 해결 |
 
 분야별 SKILL.md는 그대로 사용하므로 Pwn, Reverse, Web 등 전문 지침은 유지됩니다. 후속 wave는 `list_findings`와 기존 작업물을 먼저 읽고 완료된 triage를 반복하지 않습니다.
 
