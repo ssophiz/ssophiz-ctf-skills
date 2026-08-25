@@ -37,6 +37,9 @@ PLAYBOOK
 RULES
 - Work only in /workspace and explicit task endpoints. Target traffic requires allow_target_operations and the scoped web gate.
 - Never bypass provider, workspace, network, permission, or verifier safeguards.
+- Read notes/kickoff.json first. If it names prior-notes.txt, treat those snippets only as leads and confirm exact values in original task evidence.
+- Let the kickoff machine_loop own repeated requests, execution, search, or simulation; the model chooses hypotheses between summarized batches.
+- If task output directly contains an exact flag-shaped value, record the candidate and minimal reproduction evidence immediately; do not wait for a second model review.
 - {escalation}
 - Save raw output before summarizing. Never alter flags, hashes, addresses, offsets, payload bytes, credentials, commands, or decisive errors.
 - Keep one reproducible script when interaction is required. Record one compact ledger entry with commands, PoC paths, key output, reproduction steps, and candidates.

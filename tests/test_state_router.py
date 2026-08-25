@@ -7,7 +7,7 @@ from pathlib import Path
 from ssophiz_ctf.config import load_config
 from ssophiz_ctf.contracts import Finding, FlagCandidate, LedgerEntry, TaskEnvelope
 from ssophiz_ctf.evidence_report import build_evidence_pdf
-from ssophiz_ctf.router import infer_category, route_task, select_wave
+from ssophiz_ctf.router import build_speed_plan, infer_category, route_task, select_wave
 from ssophiz_ctf.state import StateStore
 
 
@@ -121,6 +121,10 @@ class StateAndRouterTests(unittest.TestCase):
         self.assertEqual(assignments[0]["model"], "gpt-5.6-sol")
         self.assertEqual(assignments[0]["effort"], "medium")
         self.assertTrue(all(item["fast_lane"] for item in assignments))
+        speed = build_speed_plan(task, assignments)
+        self.assertEqual(speed["lane"], "fast")
+        self.assertEqual(speed["first_profile"], "codex_fast")
+        self.assertIn("direct HTTP/WebSocket client", speed["machine_loop"])
 
     def test_malware_has_a_dedicated_category(self) -> None:
         self.assertEqual(infer_category("ransomware loader with C2 config", ["sample.exe"]), "malware")

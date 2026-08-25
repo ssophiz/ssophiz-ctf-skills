@@ -20,6 +20,7 @@ from .ctfd import CTFdClient
 from .evidence_report import build_evidence_pdf
 from .hwpx import extract_hwpx_text
 from .orca_runtime import OrcaRuntime, build_orca_plan
+from .recall import prepare_kickoff
 from .router import infer_category, route_task, select_wave
 from .state import StateStore
 
@@ -283,6 +284,17 @@ def command_plan(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_kickoff(args: argparse.Namespace) -> int:
+    config = _config(args)
+    store = _store(config)
+    try:
+        task = store.get_task(args.task_id)
+    finally:
+        store.close()
+    _json(prepare_kickoff(task, config))
+    return 0
+
+
 def _find_id(payload: Any, keys: tuple[str, ...]) -> str | None:
     if isinstance(payload, dict):
         for key in keys:
@@ -427,6 +439,7 @@ def command_dispatch(args: argparse.Namespace) -> int:
         raise ValueError(f"No worker profiles are configured for wave {wave}")
     if not args.apply:
         return command_plan(args)
+    kickoff = prepare_kickoff(task, config)
     runtime = OrcaRuntime(str(config.data["orca"]["executable"]))
     run_receipt = runtime.create_run(f"Solve and validate wave {wave}: {task.name}")
     worker_receipts: list[dict[str, Any]] = []
@@ -452,7 +465,7 @@ def command_dispatch(args: argparse.Namespace) -> int:
                 continue
             receipt = _spawn_provider(task, config, str(assignment["profile"]), "explicit parallel reviewer")
             external_receipts.append({"assignment": assignment, **receipt})
-    _json({"wave": wave, "run": run_receipt, "workers": worker_receipts, "external_workers": external_receipts})
+    _json({"wave": wave, "kickoff": kickoff, "run": run_receipt, "workers": worker_receipts, "external_workers": external_receipts})
     return 1 if worker_start_failed else 0
 
 
@@ -540,7 +553,7 @@ def command_submit(args: argparse.Namespace) -> int:
     try:
         candidate = store.get_candidate(args.candidate_id)
         if not store.candidate_has_reproduction(args.candidate_id):
-            raise ValueError("Candidate has no attached reproduction evidence")
+            raise ValueError("Candidate has no attached minimal reproduction evidence")
         classification = classify_flag_candidate(str(candidate["value"]))
         if not classification.submit_eligible:
             raise ValueError(f"Candidate is classified as {classification.kind}; refusing submission")
@@ -631,6 +644,10 @@ def build_parser() -> argparse.ArgumentParser:
     plan.add_argument("task_id")
     plan.add_argument("--wave", type=int, choices=(0, 1, 2), default=0, help="Plan one staged worker wave; default: 0")
     plan.set_defaults(func=command_plan)
+
+    kickoff = sub.add_parser("kickoff", help="Prepare the first-five-minute plan and bounded local recall")
+    kickoff.add_argument("task_id")
+    kickoff.set_defaults(func=command_kickoff)
 
     dispatch = sub.add_parser("dispatch", help="Create an Orca run and start one staged worker wave")
     dispatch.add_argument("task_id")

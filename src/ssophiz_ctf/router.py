@@ -26,6 +26,54 @@ KEYWORD_CATEGORY = {
     "forensics": ("pcap", "memory dump", "disk image", "steganography", "forensic"),
 }
 
+FIRST_CHECKS = {
+    "pwn": [
+        "Identify architecture, mitigations, loader/libc, and the first controlled crash or parser boundary.",
+        "Run strings/imports and inspect only the input path that reaches memory-unsafe code.",
+        "Put cyclic, fuzz, race, or brute-force repetitions in a local runner and save its raw output.",
+    ],
+    "reverse": [
+        "Identify format, architecture, packing, imports, and the success/failure output path.",
+        "Search strings and xrefs before decompiling only the smallest validation slice.",
+        "Move decoding, emulation, tracing, or constraint iterations into a local script.",
+    ],
+    "malware": [
+        "Hash and identify the sample, packer, imports, persistence, and likely configuration path.",
+        "Extract strings/resources statically before any bounded dynamic run.",
+        "Automate repeated decoding or configuration extraction outside the model.",
+    ],
+    "web": [
+        "Inventory routes, authentication state, client bundles, and one legitimate request sequence.",
+        "Check authorization and server-side trust boundaries before broad payload spraying.",
+        "Put request races, enumeration, replay, and protocol loops in a bounded local client.",
+    ],
+    "crypto": [
+        "Parse all parameters and test the cheapest invariant or known construction first.",
+        "Check reuse, size, entropy, subgroup, padding, and oracle assumptions mechanically.",
+        "Run algebra, brute force, SAT/SMT, or lattice experiments in a deterministic local solver.",
+    ],
+    "forensics": [
+        "Hash and inventory the artifact without modifying the original.",
+        "Extract metadata, timelines, strings, and embedded files with provenance.",
+        "Automate bulk carving, decoding, packet filtering, or candidate ranking locally.",
+    ],
+    "misc": [
+        "Inventory artifacts, endpoints, formats, and observable success conditions.",
+        "Run one cheap discriminator for the two most likely categories.",
+        "Move repeated simulation, scraping, decoding, or search into a bounded local runner.",
+    ],
+}
+
+MACHINE_LOOPS = {
+    "pwn": "pwntools/GDB runner owns crashes, offsets, heap shaping, races, and retries",
+    "reverse": "batch disassembler, emulator, tracer, or solver owns repeated execution",
+    "malware": "isolated decoder or bounded sandbox runner owns repeated extraction",
+    "web": "direct HTTP/WebSocket client owns enumeration, races, replay, and timing samples",
+    "crypto": "Python/Sage/Z3 runner owns algebra, search, and candidate verification",
+    "forensics": "local extraction pipeline owns carving, filtering, decoding, and ranking",
+    "misc": "small deterministic script owns repeated simulation, scraping, or decoding",
+}
+
 
 def infer_category(description: str, artifacts: list[str]) -> str:
     lowered = description.lower()
@@ -70,3 +118,21 @@ def select_wave(assignments: list[dict[str, Any]], wave: int) -> list[dict[str, 
     if wave < 0:
         raise ValueError("wave must be non-negative")
     return [assignment for assignment in assignments if int(assignment.get("wave", 0)) == wave]
+
+
+def build_speed_plan(task: TaskEnvelope, assignments: list[dict[str, Any]]) -> dict[str, Any]:
+    first = min(assignments, key=lambda item: int(item.get("wave", 0))) if assignments else {}
+    fast_lane = bool(first.get("fast_lane"))
+    return {
+        "category": task.category,
+        "lane": "fast" if fast_lane else "staged",
+        "first_profile": first.get("profile"),
+        "first_checks": FIRST_CHECKS[task.category],
+        "machine_loop": (
+            "direct HTTP/WebSocket client or challenge-protocol client owns timing, retries, simulation, and reconnects"
+            if fast_lane
+            else MACHINE_LOOPS[task.category]
+        ),
+        "model_job": "Choose the next hypothesis from summarized batches; do not manually drive the hot loop.",
+        "stop": "Publish a directly observed, evidence-linked candidate or one concrete blocker.",
+    }

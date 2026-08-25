@@ -15,6 +15,12 @@
     "base_url": "${SSOPHIZ_CTFD_URL}",
     "token_env": "SSOPHIZ_CTFD_TOKEN"
   },
+  "retrieval": {
+    "roots": ["docs", "${SSOPHIZ_CTF_CORPUS}"],
+    "semantic_file_threshold": 80,
+    "top_k": 5,
+    "max_snippet_lines": 12
+  },
   "profiles": {
     "codex_triage": {
       "adapter": "orca",

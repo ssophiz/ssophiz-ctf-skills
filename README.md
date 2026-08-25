@@ -70,6 +70,20 @@ Run the harness through the repository virtual environment so the checked-out co
 .\scripts\ctf-harness.ps1 doctor
 ```
 
+Configure an optional private Markdown/Obsidian corpus, then prepare the
+first-five-minute packet before dispatch. The corpus stays local and is never
+committed:
+
+```powershell
+$env:SSOPHIZ_CTF_CORPUS = 'D:\Obsidian\CTF'
+.\scripts\ctf-harness.ps1 kickoff <task_id>
+.\scripts\ctf-harness.ps1 dispatch <task_id> --apply
+```
+
+Small corpora use exact local search. Large corpora use bounded Semble retrieval.
+The generated `notes/kickoff.json` also tells the worker which deterministic
+runner should own brute force, races, replay, emulation, or other hot loops.
+
 ## LAN worker in Orca
 
 On a second Windows PC with this repository available, prepare the CTF skills,
