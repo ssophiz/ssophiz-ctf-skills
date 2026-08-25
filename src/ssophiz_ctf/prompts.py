@@ -20,7 +20,9 @@ def build_worker_prompt(task: TaskEnvelope, assignment: dict[str, Any], skill_te
     profile_json = json.dumps(assignment, ensure_ascii=False, separators=(",", ":"))
     wave = int(assignment.get("wave", 0))
     escalation = (
-        "Classification pass only: run at most three cheap decisive checks, then publish QUICK, SOLVE, HARD, or BLOCKED."
+        "Latency-sensitive fast lane: build and run the deterministic harness or PoC first; avoid prose-only triage."
+        if assignment.get("fast_lane")
+        else "Classification pass only: run at most three cheap decisive checks, then publish QUICK, SOLVE, HARD, or BLOCKED."
         if wave == 0
         else "Call list_findings first and read existing artifacts; do not repeat completed triage."
     )

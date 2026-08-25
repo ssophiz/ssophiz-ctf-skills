@@ -42,6 +42,11 @@ def infer_category(description: str, artifacts: list[str]) -> str:
 
 def route_task(task: TaskEnvelope, config: HarnessConfig) -> list[dict[str, Any]]:
     profile_names = config.routes.get(task.category, config.routes.get("misc", []))
+    fast_lane = config.data.get("fast_lane", {})
+    task_text = f"{task.name} {task.description}".lower()
+    is_fast_lane = any(keyword.lower() in task_text for keyword in fast_lane.get("keywords", []))
+    if is_fast_lane:
+        profile_names = fast_lane.get("profiles", profile_names)
     assignments: list[dict[str, Any]] = []
     for index, profile_name in enumerate(profile_names):
         profile = config.profiles[profile_name]
@@ -54,7 +59,8 @@ def route_task(task: TaskEnvelope, config: HarnessConfig) -> list[dict[str, Any]
                 "effort": profile.get("effort"),
                 "role": profile.get("role", task.category),
                 "focus": profile.get("focus", "Independently solve and validate the task."),
-                "wave": int(profile.get("wave", 0 if index == 0 else 1)),
+                "wave": index if is_fast_lane else int(profile.get("wave", 0 if index == 0 else 1)),
+                "fast_lane": is_fast_lane,
             }
         )
     return assignments

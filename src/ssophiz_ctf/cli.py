@@ -277,7 +277,7 @@ def command_plan(args: argparse.Namespace) -> int:
             "assignments": selected,
             "available_waves": sorted({int(item["wave"]) for item in assignments}),
             "orca_commands": [{"purpose": item.purpose, "argv": item.argv} for item in commands],
-            "note": "Wave 0 runs low-cost Luna triage. Use wave 1 Sol medium for the selected path and wave 2 Sol xhigh only for a concrete blocker.",
+            "note": "Wave 0 runs Luna low triage, except race/realtime/game tasks use the Sol medium fast lane. Escalate only concrete blockers.",
         }
     )
     return 0
@@ -635,7 +635,7 @@ def build_parser() -> argparse.ArgumentParser:
     dispatch = sub.add_parser("dispatch", help="Create an Orca run and start one staged worker wave")
     dispatch.add_argument("task_id")
     dispatch.add_argument("--apply", action="store_true", help="Actually create the Orca run and workers")
-    dispatch.add_argument("--wave", type=int, choices=(0, 1, 2), default=0, help="0=Luna low triage, 1=Sol medium solve, 2=Sol xhigh blocker")
+    dispatch.add_argument("--wave", type=int, choices=(0, 1, 2), default=0, help="0=Luna low or Sol fast lane, 1=solve/escalate, 2=deep blocker")
     dispatch.add_argument("--with-api-workers", action="store_true", help="Also start configured API/Ollama workers; this can consume provider credits")
     dispatch.set_defaults(func=command_dispatch)
 

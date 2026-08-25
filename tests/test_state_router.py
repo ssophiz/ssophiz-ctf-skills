@@ -107,6 +107,21 @@ class StateAndRouterTests(unittest.TestCase):
     def test_category_inference_prefers_artifact_signal(self) -> None:
         self.assertEqual(infer_category("no hint", ["capture.pcapng"]), "forensics")
 
+    def test_latency_sensitive_tasks_skip_luna_triage(self) -> None:
+        config = load_config(Path(__file__).parents[1] / "config" / "harness.example.json")
+        task = TaskEnvelope.create(
+            name="grid racing game",
+            category="misc",
+            description="realtime physics bot over WebSocket",
+            workspace="C:/tmp/task",
+        )
+        assignments = route_task(task, config)
+        self.assertEqual([item["profile"] for item in assignments], ["codex_fast", "codex_deep"])
+        self.assertEqual([item["wave"] for item in assignments], [0, 1])
+        self.assertEqual(assignments[0]["model"], "gpt-5.6-sol")
+        self.assertEqual(assignments[0]["effort"], "medium")
+        self.assertTrue(all(item["fast_lane"] for item in assignments))
+
     def test_malware_has_a_dedicated_category(self) -> None:
         self.assertEqual(infer_category("ransomware loader with C2 config", ["sample.exe"]), "malware")
 

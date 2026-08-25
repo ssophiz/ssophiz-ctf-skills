@@ -50,6 +50,10 @@
       "max_turns": 20
     }
   },
+  "fast_lane": {
+    "keywords": ["race condition", "timing race", "toctou", "scheduler", "workqueue", "realtime", "real-time", "websocket", "physics", "racing", "lap", "game", "bot"],
+    "profiles": ["codex_fast", "codex_deep"]
+  },
   "routes": {
     "pwn": ["codex_triage", "codex_fast", "codex_deep"],
     "reverse": ["codex_triage", "codex_fast", "codex_deep"],

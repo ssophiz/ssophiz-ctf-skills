@@ -167,6 +167,8 @@ $env:SSOPHIZ_CTFD_TOKEN = "..."
 
 기본 dispatch는 Luna low 워커 하나로 최대 세 가지 값싼 검사를 수행합니다. 선택된 경로만 wave 1의 Sol medium으로 풀고, 구체적인 blocker가 남았을 때만 wave 2의 Sol xhigh를 실행합니다.
 
+레이스컨디션, TOCTOU, scheduler/workqueue, 실시간 게임, WebSocket, 물리 시뮬레이션 신호가 있는 문제는 fast lane으로 분류합니다. 이 경우 Luna를 생략하고 wave 0에서 Sol medium이 먼저 결정론적 PoC·반복 실행기·게임 봇을 작성하며, 모델이 요청 루프를 직접 운전하지 않습니다.
+
 ```powershell
 .\scripts\ctf-harness.ps1 dispatch <task_id> --apply --wave 1
 .\scripts\ctf-harness.ps1 dispatch <task_id> --apply --wave 2

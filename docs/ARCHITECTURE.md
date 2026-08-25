@@ -6,6 +6,7 @@
 2. router가 분야별 playbook을 유지하면서 worker profile을 세 단계 wave로 배치합니다.
 3. Orca는 선택한 wave의 worker 하나만 별도 run task로 생성하고 상태를 추적합니다.
 4. wave 0은 Luna low 분류, wave 1은 Sol medium 풀이, wave 2는 blocker용 Sol xhigh입니다.
+   레이스컨디션·실시간 게임 신호가 있으면 fast lane이 Luna를 생략하고 Sol medium을 wave 0으로 당깁니다.
 5. 모든 워커는 finding과 flag candidate만 control plane에 게시합니다.
 6. verifier가 CTFd 토큰을 보유하고 후보를 단일 제출합니다.
 
