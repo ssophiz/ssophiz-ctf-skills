@@ -22,7 +22,10 @@ Copy-Item -Recurse .\skills\reverse "$env:USERPROFILE\.agents\skills\ssophiz-ctf
 
 The sanitized [CCE 2026 retrospective](docs/CCE2026_POSTMORTEM.md) records the
 operational lessons used to strengthen these skills without publishing any
-challenge answers.
+challenge answers. The separate
+[post-event recovery audit](docs/CCE2026_RECOVERY_AUDIT.md) records the bounded
+Lease Journal, nsprobe, PiEEE, GRID, and mail-server follow-up without flags or
+raw event artifacts.
 
 ## Optional context-efficiency tools
 

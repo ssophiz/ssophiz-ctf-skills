@@ -34,6 +34,11 @@ Team 0xLSA finished in 20th place. The final Korean write-up documented 16 solve
 - Added competition-derived reference patterns for Reverse, Pwn, and Web workers.
 - Added a postmortem skill that separates private evidence from public-safe lessons.
 - Expanded repository ignore rules for event workspaces, agent state, dumps, and generated evidence.
+- Added a Sol fast lane for explicit race-condition, real-time protocol, and game tasks.
+
+The bounded offline follow-up for the five incomplete challenges is documented
+in [CCE2026_RECOVERY_AUDIT.md](CCE2026_RECOVERY_AUDIT.md). It records only
+sanitized findings and does not claim any post-event competition flag.
 
 ## Practice backlog
 
