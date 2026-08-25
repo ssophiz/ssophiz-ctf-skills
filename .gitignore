@@ -12,7 +12,8 @@ build/
 
 # Local agent state and credentials
 .claude/
-.codex/
+.codex/*
+!.codex/config.toml
 .agents/
 .mcp.local.json
 graphify-out/

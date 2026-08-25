@@ -148,3 +148,34 @@ Compare similar tasks with and without each tool. Record files read, input/outpu
 For worker handoffs, prefer five lines: status, one finding, evidence paths,
 exact candidate or `none`, and one next experiment. This avoids repeatedly
 copying full challenge transcripts into every worker.
+
+## Project-scoped Codex defaults
+
+The committed `.codex/config.toml` applies conservative defaults whenever
+Codex trusts and opens this repository:
+
+- medium reasoning and low response verbosity for interactive triage;
+- an 8,000-token per-tool history limit;
+- web search and Apps disabled by default;
+- at most two nested subagent threads.
+
+Orca's explicit `--effort` still overrides the reasoning default, so wave 1
+continues to use xhigh only after a concrete blocker. The output limit is not
+an evidence limit: save raw command output to the task workspace before
+summarizing it.
+
+For an authorized OSINT problem that genuinely needs live search, start a
+separate session instead of changing the repository default:
+
+```powershell
+codex -c 'web_search="live"'
+```
+
+Use `codex -s read-only` for planning or review only. Active CTF solving needs
+workspace writes for PoCs, extracted artifacts, and evidence, so read-only is
+not the default. Start a new session for each challenge or unrelated problem;
+do not carry a full transcript between tasks.
+
+Keep compact handoff labels in English, but do not translate an entire Korean
+challenge just to chase token counts. Store the original statement once and
+pass later workers only the evidence paths and the five-line handoff.

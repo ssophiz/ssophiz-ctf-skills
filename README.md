@@ -40,6 +40,11 @@ UI work. See [docs/AGENT_EFFICIENCY.md](docs/AGENT_EFFICIENCY.md) for routing,
 privacy, and token-measurement guidance. Pinned source versions are recorded in
 [config/agent-tools.lock.json](config/agent-tools.lock.json).
 
+This repository also ships project-scoped Codex defaults in
+`.codex/config.toml`: medium reasoning, low verbosity, bounded tool history,
+disabled Apps/web search, and two nested subagents at most. Explicit Orca wave
+settings still override reasoning effort when escalation is required.
+
 ## Live evidence ledger
 
 Solver workers can preserve decisive commands, PoC paths, key output, flag
