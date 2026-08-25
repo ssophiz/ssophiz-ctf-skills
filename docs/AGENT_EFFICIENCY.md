@@ -1,6 +1,6 @@
 # Agent context-efficiency tools
 
-This repository supports six optional third-party tools. They solve different
+This repository supports eight optional third-party tools. They solve different
 problems and none replaces challenge-specific verification. The project skill
 `ctf-token-efficiency` routes them without compressing exact exploit evidence.
 
@@ -8,6 +8,8 @@ problems and none replaces challenge-specific verification. The project skill
 |---|---|---|
 | Ponytail | Avoid unnecessary implementation | On-demand skill; `lite` during research |
 | Graphify | Query a source-code knowledge graph | Use for cross-file questions only |
+| Semble | Retrieve small relevant code or documentation snippets | CLI only; use when the symbol is unknown |
+| ast-grep | Match structural code patterns | On-demand skill; bound language and path |
 | Headroom | Compress large model inputs and tool output | Opt-in launch wrapper |
 | CodeBurn | Measure token and cost history | Baseline and milestone only |
 | Caveman | Shorten natural-language output | Skill-only, explicit `lite` mode |
@@ -47,6 +49,34 @@ Codex user skills are installed once under `~/.agents/skills`; Claude Code gets
 its copy under `~/.claude/skills`. Do not duplicate the same user skill under
 legacy `~/.codex/skills`, because Codex does not merge identical skill names and
 the duplicate descriptions consume discovery context.
+
+## Semble
+
+Semble performs local hybrid code and Markdown retrieval and returns bounded
+snippets. Keep it as a CLI instead of registering another permanent MCP server:
+
+```powershell
+semble search "authorization flow" . --top-k 5 --max-snippet-lines 12
+semble search "request ordering race" C:\path\to\vault --content docs --top-k 5 --max-snippet-lines 12
+```
+
+Use `rg` for small source trees or when an exact string or symbol is known. Use
+Semble only when a tree is large or unfamiliar and the concept is known but its
+location is not. Use Graphify when callers, callees, or cross-file relationships
+are the question. The first Semble search downloads a small local embedding
+model; prewarm it before a competition.
+
+## ast-grep
+
+ast-grep performs deterministic AST matching without sending source to a model.
+Use it for repeated structural patterns that plain text search expresses poorly:
+
+```powershell
+ast-grep run -p 'subprocess.run($$$ARGS)' -l python src
+```
+
+Restrict the path and language. Treat matches as an index and read the original
+source span before building a PoC.
 
 ## Headroom
 
@@ -100,7 +130,9 @@ Web, Pwn, Reverse, Crypto, Forensics, Malware, or Misc analysis.
 
 - WarpGrep is not enabled by default. It requires a Morph API key and can send
   repository context to an external service; the local Graphify index plus
-  `rg` covers the normal CTF source-navigation path.
+  `rg` and Semble cover the normal CTF source-navigation path.
+- jCodeMunch and Serena are not enabled by default. Their symbol and graph
+  retrieval overlaps Semble and Graphify, while adding another MCP tool surface.
 - Valyu is not enabled by default. It requires an external API key and is not a
   substitute for task-scoped evidence or official technical sources.
 - `gh-fix-ci` and `gh-address-comments` are useful official repository

@@ -3,6 +3,9 @@ param(
     [string]$ProxyUrl = $env:CCE_PROXY_URL,
     [string]$PonytailRef = "2ed6c52c9d7e5e56942508591085fd45dea277d3",
     [string]$GraphifyVersion = "0.9.48",
+    [string]$SembleVersion = "0.5.5",
+    [string]$AstGrepVersion = "0.45.2",
+    [string]$AstGrepSkillRef = "6b668aa526afdc623c1a9ed1d6ae920e04a717ad",
     [string]$HeadroomVersion = "0.36.5",
     [string]$CodeBurnVersion = "0.9.20",
     [string]$CavemanRef = "7bb71309e8749a4f112aacd3a54b3941d8689905",
@@ -85,12 +88,12 @@ $Node = Get-Command node -ErrorAction Stop
 $Npm = (Get-Command npm -ErrorAction Stop).Source
 $Python = (Get-Command python -ErrorAction Stop).Source
 
-Write-Host "[1/8] Installing Ponytail as an on-demand skill..."
+Write-Host "[1/10] Installing Ponytail as an on-demand skill..."
 Install-PinnedSkills -Repository "DietrichGebert/ponytail" -Ref $PonytailRef -SkillPaths @{
     "skills/ponytail" = "ponytail"
 }
 
-Write-Host "[2/8] Ensuring uv is available..."
+Write-Host "[2/10] Ensuring uv is available..."
 $UvCommand = Get-Command uv -ErrorAction SilentlyContinue
 if (-not $UvCommand) {
     $UvCandidate = Get-ChildItem -Path (Join-Path $env:APPDATA 'Python\Python*\Scripts\uv.exe') -ErrorAction SilentlyContinue |
@@ -111,7 +114,7 @@ else {
     $UvPath = $UvCommand.Source
 }
 
-Write-Host "[3/8] Installing Graphify $GraphifyVersion..."
+Write-Host "[3/10] Installing Graphify $GraphifyVersion..."
 Invoke-Checked $UvPath tool install --upgrade "graphifyy==$GraphifyVersion"
 Invoke-Checked $UvPath tool update-shell
 $GraphifyPath = Join-Path $env:USERPROFILE '.local\bin\graphify.exe'
@@ -126,7 +129,24 @@ if (-not $SkipProjectGraphify) {
     Invoke-Checked $GraphifyPath install --project --platform codex
 }
 
-Write-Host "[4/8] Installing Headroom $HeadroomVersion in an isolated environment..."
+Write-Host "[4/10] Installing Semble $SembleVersion for local snippet retrieval..."
+Invoke-Checked $UvPath tool install --upgrade "semble==$SembleVersion"
+$SemblePath = Join-Path $env:USERPROFILE '.local\bin\semble.exe'
+if (-not (Test-Path -LiteralPath $SemblePath)) {
+    $SembleCommand = Get-Command semble -ErrorAction SilentlyContinue
+    if (-not $SembleCommand) {
+        throw "Semble installed, but semble.exe was not found. Restart the shell and run this script again."
+    }
+    $SemblePath = $SembleCommand.Source
+}
+
+Write-Host "[5/10] Installing ast-grep $AstGrepVersion and its on-demand skill..."
+Invoke-Checked $Npm install -g "@ast-grep/cli@$AstGrepVersion"
+Install-PinnedSkills -Repository "ast-grep/agent-skill" -Ref $AstGrepSkillRef -SkillPaths @{
+    "ast-grep/skills/ast-grep" = "ast-grep"
+}
+
+Write-Host "[6/10] Installing Headroom $HeadroomVersion in an isolated environment..."
 $HeadroomEnv = Join-Path $env:USERPROFILE '.local\share\headroom-venv'
 $HeadroomPython = Join-Path $HeadroomEnv 'Scripts\python.exe'
 $HeadroomPath = Join-Path $HeadroomEnv 'Scripts\headroom.exe'
@@ -135,27 +155,30 @@ if (-not (Test-Path -LiteralPath $HeadroomPython)) {
 }
 Invoke-Checked $HeadroomPython -m pip install --upgrade "headroom-ai[proxy,mcp]==$HeadroomVersion"
 
-Write-Host "[5/8] Installing CodeBurn $CodeBurnVersion..."
+Write-Host "[7/10] Installing CodeBurn $CodeBurnVersion..."
 Invoke-Checked $Npm install -g "codeburn@$CodeBurnVersion"
 
-Write-Host "[6/8] Installing Caveman skills without proxy hooks..."
+Write-Host "[8/10] Installing Caveman skills without proxy hooks..."
 Install-PinnedSkills -Repository "JuliusBrussee/caveman" -Ref $CavemanRef -SkillPaths @{
     "skills/caveman" = "caveman"
     "skills/caveman-compress" = "caveman-compress"
 }
 
-Write-Host "[7/8] Installing Impeccable as an on-demand UI skill..."
+Write-Host "[9/10] Installing Impeccable as an on-demand UI skill..."
 Install-PinnedSkills -Repository "pbakaus/impeccable" -Ref $ImpeccableRef -SkillPaths @{
     "plugin/skills/impeccable" = "impeccable"
 }
 
-Write-Host "[8/8] Verifying installations..."
+Write-Host "[10/10] Verifying installations..."
 Invoke-Checked $GraphifyPath --version
+Invoke-Checked $SemblePath --version
 Invoke-Checked $HeadroomPath --version
+$AstGrep = (Get-Command ast-grep -ErrorAction Stop).Source
+Invoke-Checked $AstGrep --version
 $CodeBurn = (Get-Command codeburn -ErrorAction Stop).Source
 Invoke-Checked $CodeBurn --version
 foreach ($Root in @('.agents\skills', '.claude\skills')) {
-    foreach ($Skill in @('ponytail', 'caveman', 'caveman-compress', 'impeccable')) {
+    foreach ($Skill in @('ponytail', 'ast-grep', 'caveman', 'caveman-compress', 'impeccable')) {
         $SkillFile = Join-Path (Join-Path $env:USERPROFILE $Root) "$Skill\SKILL.md"
         if (-not (Test-Path -LiteralPath $SkillFile)) {
             throw "Skill installation verification failed: $SkillFile"

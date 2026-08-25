@@ -9,7 +9,10 @@ Save raw challenge inputs and tool output to the task workspace before summarizi
 
 Route work by need:
 
-- Use Graphify for cross-file architecture, call-path, and symbol questions when a project graph exists. Use `rg` or a direct read for one file or one symbol.
+- Use `rg` or a direct read for a small source tree, exact string, one file, or one known symbol.
+- Use Semble CLI only when the tree is large or unfamiliar and the concept is known but the file or symbol is not. Keep retrieval bounded, for example `semble search "authorization flow" . --top-k 5 --max-snippet-lines 12`. Use `--content docs` for prior Markdown notes. Do not register its MCP server by default.
+- Use Graphify for cross-file architecture, call-path, and dependency questions when a project graph exists.
+- Use ast-grep for a repeated structural code pattern that text search cannot express precisely. Restrict the language and path, then open the original matched span before using it as exploit evidence.
 - Use Headroom only for large, repetitive listings, JSON, logs, or transcripts. Retrieve the original span before using an exact value in a PoC or verifier.
 - Use Caveman `lite` for compact progress updates and worker handoffs. Keep code, commands, warnings, reports, and reproduction steps in normal precise language. Do not enable Caveman proxy hooks together with Ponytail hooks.
 - Use CodeBurn at a baseline or milestone, not every turn. It measures token use but does not reduce it.

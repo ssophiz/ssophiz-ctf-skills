@@ -12,6 +12,22 @@
     "commit": "b2cd36267456c166788c95be6e68574064a92a42",
     "install": "uv-tool"
   },
+  "semble": {
+    "package": "semble",
+    "version": "0.5.5",
+    "source": "https://github.com/MinishLab/semble",
+    "commit": "921849164e2632dd4f0e1c1370f82cfe15ed6d6c",
+    "install": "uv-tool-cli-only"
+  },
+  "ast-grep": {
+    "package": "@ast-grep/cli",
+    "version": "0.45.2",
+    "source": "https://github.com/ast-grep/ast-grep",
+    "commit": "c41e023a64060c9f263c23320aa5ff67be4bc474",
+    "skill_source": "https://github.com/ast-grep/agent-skill",
+    "skill_commit": "6b668aa526afdc623c1a9ed1d6ae920e04a717ad",
+    "install": "npm-global-plus-pinned-skill"
+  },
   "headroom": {
     "package": "headroom-ai",
     "version": "0.36.5",

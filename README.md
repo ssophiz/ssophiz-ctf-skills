@@ -29,8 +29,9 @@ raw event artifacts.
 
 ## Optional context-efficiency tools
 
-Ponytail, Graphify, Headroom, CodeBurn, Caveman, and Impeccable can be installed
-reproducibly for Codex, Claude Code, and this project:
+Ponytail, Graphify, Semble, ast-grep, Headroom, CodeBurn, Caveman, and
+Impeccable can be installed reproducibly for Codex, Claude Code, and this
+project:
 
 ```powershell
 .\scripts\install-agent-efficiency-tools.ps1
