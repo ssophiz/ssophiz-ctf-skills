@@ -9,8 +9,8 @@ artifacts.
 
 The `skills/` directory follows the `SKILL.md` frontmatter convention used by
 Codex and other compatible agents. It contains category workers for Crypto,
-Forensics, Malware, Misc, Pwn, Reverse, and Web, plus orchestration and
-post-event distillation skills.
+Forensics, Malware, Misc, Pwn, Reverse, Web, and latency-sensitive browser
+games, plus orchestration and post-event distillation skills.
 
 Install a skill by copying or linking its directory into your agent's skill
 discovery path. For example, on Windows:

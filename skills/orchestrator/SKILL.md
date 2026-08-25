@@ -15,6 +15,8 @@ During the event, require each solver to call `record_evidence` with only the de
 
 Keep Pwn, Reverse, and Web work independent until a concrete handoff exists. Examples include a leaked binary from Web, a decryption routine from Reverse, or an endpoint protocol identified by Pwn. Record the handoff as a finding with source paths and the next worker's question.
 
+Route explicit real-time browser games, WebSocket or SSE state machines, served-bundle recovery, server-paced simulations, and request-order races to `ctf-realtime-web-game`. It owns the browser-to-direct-client transition and local hot loop; generic Web work should not duplicate that loop.
+
 Do not run analysis commands directly from this role, request verifier access, or submit flags. A candidate needs an attached reproduction path before it moves to verifier review.
 
 At event close, hand the evidence ledger and final write-up to `ctf-postmortem` for private reconciliation and public-safe skill distillation.

@@ -11,6 +11,8 @@ Read [references/competition-patterns.md](references/competition-patterns.md) fo
 
 Browser and proxy integrations are for reproducing a precise interaction, not broad discovery outside the challenge. If a Web observation yields a binary, secret format, or cryptographic primitive, save it to the workspace and publish a handoff finding.
 
+When the decisive behavior is a real-time game, persistent WebSocket or SSE state machine, actively served bundle, server-paced simulation, or request-order race, hand off to `ctf-realtime-web-game` after preserving the minimal route and authentication context.
+
 Use the task's supplied accounts, tokens, and endpoints only. Do not add targets, perform internet-wide scanning, or reuse challenge credentials elsewhere.
 
 Every candidate must be tied to a reproducible request sequence or source-level proof.

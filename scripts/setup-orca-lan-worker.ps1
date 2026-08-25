@@ -30,7 +30,7 @@ function Install-ProjectSkills {
 
     $skillNames = @(
         "web", "pwn", "reverse", "crypto",
-        "forensics", "malware", "misc", "orchestrator",
+        "forensics", "malware", "misc", "orchestrator", "realtime-web-game",
         "token-efficiency"
     )
     $targetRoots = @(
