@@ -15,12 +15,13 @@ from typing import Any
 from .archives import ArchiveLimits, prepare_archive
 from .api_worker import APIWorker
 from .config import HarnessConfig, load_config
+from .corpus import collection_sources, sync_collection
 from .contracts import TaskEnvelope, classify_flag_candidate
 from .ctfd import CTFdClient
 from .evidence_report import build_evidence_pdf
 from .hwpx import extract_hwpx_text
 from .orca_runtime import OrcaRuntime, build_orca_plan
-from .recall import prepare_kickoff
+from .recall import prepare_kickoff, recall_query
 from .router import infer_category, route_task, select_wave
 from .state import StateStore
 
@@ -293,6 +294,22 @@ def command_kickoff(args: argparse.Namespace) -> int:
         store.close()
     _json(prepare_kickoff(task, config))
     return 0
+
+
+def command_recall(args: argparse.Namespace) -> int:
+    _json(recall_query(args.query, _config(args), args.collection))
+    return 0
+
+
+def command_corpus_sources(args: argparse.Namespace) -> int:
+    _json(collection_sources(_config(args), args.collection))
+    return 0
+
+
+def command_corpus_sync(args: argparse.Namespace) -> int:
+    result = sync_collection(_config(args), args.collection, args.destination)
+    _json(result)
+    return 0 if result["status"] == "ready" else 1
 
 
 def _find_id(payload: Any, keys: tuple[str, ...]) -> str | None:
@@ -648,6 +665,20 @@ def build_parser() -> argparse.ArgumentParser:
     kickoff = sub.add_parser("kickoff", help="Prepare the first-five-minute plan and bounded local recall")
     kickoff.add_argument("task_id")
     kickoff.set_defaults(func=command_kickoff)
+
+    recall = sub.add_parser("recall", help="Search bounded local CTF history with optional collection filtering")
+    recall.add_argument("query")
+    recall.add_argument("--collection", default="")
+    recall.set_defaults(func=command_recall)
+
+    corpus_sources = sub.add_parser("corpus-sources", help="List allowlisted public corpus sources")
+    corpus_sources.add_argument("--collection", default="enki")
+    corpus_sources.set_defaults(func=command_corpus_sources)
+
+    corpus_sync = sub.add_parser("corpus-sync", help="Sync allowlisted public sources into a local corpus")
+    corpus_sync.add_argument("--collection", default="enki")
+    corpus_sync.add_argument("--destination", default="")
+    corpus_sync.set_defaults(func=command_corpus_sync)
 
     dispatch = sub.add_parser("dispatch", help="Create an Orca run and start one staged worker wave")
     dispatch.add_argument("task_id")

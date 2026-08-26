@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "collection": "enki",
+  "root_env": "SSOPHIZ_ENKI_CORPUS",
+  "default_root": ".harness/corpora/enki",
+  "keywords": ["cce", "enki", "엔키", "codegate", "fiesta"],
+  "sources": [
+    {
+      "id": "enki-redteam-ctf-2026-jeopardy",
+      "title": "ENKI RedTeam CTF 2026 Jeopardy write-up",
+      "type": "page",
+      "url": "https://www.enki.co.kr/en/media-center/blog/enki-redteam-ctf-jeopardy-writeup",
+      "provenance": "official",
+      "publisher": "ENKI WhiteHat",
+      "event": "ENKI RedTeam CTF",
+      "year": 2026,
+      "categories": ["web", "pwn", "reverse", "misc"],
+      "license": "not-stated",
+      "ingest": true
+    },
+    {
+      "id": "enki-odin-ctf",
+      "title": "Odin CTF write-ups",
+      "type": "github",
+      "url": "https://github.com/enki-kr/odin-ctf.git",
+      "provenance": "official-org",
+      "publisher": "enki-kr",
+      "event": "multiple",
+      "year": 2024,
+      "categories": ["web", "pwn", "reverse", "crypto", "misc"],
+      "license": "not-stated",
+      "ingest": true
+    },
+    {
+      "id": "enki-codegate-2025-fullchain",
+      "title": "CODEGATE 2025 final full-chain material",
+      "type": "github",
+      "url": "https://github.com/enki-kr/codegate2025-final-fullchain.git",
+      "provenance": "official-org",
+      "publisher": "enki-kr",
+      "event": "CODEGATE 2025 Final",
+      "year": 2025,
+      "categories": ["web", "pwn", "reverse"],
+      "license": "not-stated",
+      "ingest": true
+    },
+    {
+      "id": "enki-github-organization",
+      "title": "ENKI public GitHub organization",
+      "type": "reference",
+      "url": "https://github.com/enki-kr",
+      "provenance": "official-org",
+      "publisher": "enki-kr",
+      "license": "mixed",
+      "ingest": false
+    },
+    {
+      "id": "enki-ctf-operations",
+      "title": "ENKI WhiteHat CTF operations overview",
+      "type": "reference",
+      "url": "https://www.enki.co.kr/media-center/blog/inside-ctf-run-by-white-hat-hackers",
+      "provenance": "official",
+      "publisher": "ENKI WhiteHat",
+      "license": "not-stated",
+      "ingest": false
+    }
+  ]
+}

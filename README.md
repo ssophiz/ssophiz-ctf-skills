@@ -84,6 +84,21 @@ Small corpora use exact local search. Large corpora use bounded Semble retrieval
 The generated `notes/kickoff.json` also tells the worker which deterministic
 runner should own brute force, races, replay, emulation, or other hot loops.
 
+The committed ENKI source manifest contains only allowlisted public references.
+Raw pages and repositories stay under the ignored local corpus directory, while
+derived retrieval text masks historical flags to prevent accidental submission:
+
+```powershell
+.\scripts\ctf-harness.ps1 corpus-sources --collection enki
+.\scripts\ctf-harness.ps1 corpus-sync --collection enki
+.\scripts\ctf-harness.ps1 recall "WAF cache partial inspection" --collection enki
+```
+
+CCE, ENKI, CODEGATE, and FIESTA task names automatically prioritize this local
+collection during `kickoff`. RAG-Anything may index the same local raw directory
+offline for PDFs and images; it is deliberately not a default dependency or an
+always-on MCP server.
+
 ## LAN worker in Orca
 
 On a second Windows PC with this repository available, prepare the CTF skills,

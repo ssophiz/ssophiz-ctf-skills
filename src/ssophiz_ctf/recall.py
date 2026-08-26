@@ -10,6 +10,7 @@ from typing import Any
 
 from .config import HarnessConfig
 from .contracts import TaskEnvelope
+from .corpus import matching_collection_roots
 from .router import build_speed_plan, route_task
 
 
@@ -30,22 +31,46 @@ def build_recall_query(task: TaskEnvelope) -> str:
     return f"{task.name} {_CATEGORY_TERMS[task.category]} {description}".strip()
 
 
-def _resolve_roots(config: HarnessConfig) -> list[Path]:
+def _resolved_path(config: HarnessConfig, value: Any) -> Path | None:
     project_root = config.path.parent.parent
-    configured = list(config.data.get("retrieval", {}).get("roots", []))
+    if not str(value).strip():
+        return None
+    path = Path(str(value)).expanduser()
+    path = path if path.is_absolute() else project_root / path
+    path = path.resolve()
+    return path if path.is_dir() else None
+
+
+def _resolve_roots(config: HarnessConfig, query: str, collection: str = "") -> tuple[list[Path], list[str]]:
+    settings = config.data.get("retrieval", {})
+    roots: list[Path] = []
+    selected: list[str] = []
+    lowered = query.casefold()
+    for item in settings.get("collections", []):
+        name = str(item.get("name") or "")
+        include = name == collection if collection else any(
+            str(keyword).casefold() in lowered for keyword in item.get("keywords", [])
+        )
+        path = _resolved_path(config, item.get("root", "")) if include else None
+        if path and path not in roots:
+            roots.append(path)
+            selected.append(name)
+    for name, path in matching_collection_roots(config, query, collection):
+        if name not in selected and path not in roots:
+            roots.append(path)
+            selected.append(name)
+    if collection:
+        return roots, selected
+
+    configured = list(settings.get("roots", []))
     extra = os.getenv("SSOPHIZ_CTF_CORPUS", "")
     if extra:
         configured.extend(item for item in extra.split(os.pathsep) if item)
-    roots: list[Path] = []
     for value in configured:
-        if not str(value).strip():
-            continue
-        path = Path(str(value)).expanduser()
-        path = path if path.is_absolute() else project_root / path
-        path = path.resolve()
-        if path.is_dir() and path not in roots:
+        path = _resolved_path(config, value)
+        if path and path not in roots:
             roots.append(path)
-    return roots
+    return roots, selected
 
 
 def _document_count(roots: list[Path], limit: int) -> int:
@@ -81,16 +106,31 @@ def _python_search(query: str, roots: list[Path], line_limit: int) -> str:
     return "\n".join(rows)
 
 
-def recall_prior_notes(task: TaskEnvelope, config: HarnessConfig) -> dict[str, Any]:
+def _rank_lines(lines: list[str], terms: list[str], limit: int) -> list[str]:
+    ranked = sorted(
+        enumerate(lines),
+        key=lambda item: (-sum(term.casefold() in item[1].casefold() for term in terms), item[0]),
+    )
+    return [line for _, line in ranked[:limit]]
+
+
+def recall_query(query: str, config: HarnessConfig, collection: str = "") -> dict[str, Any]:
     settings = config.data.get("retrieval", {})
-    roots = _resolve_roots(config)
+    roots, collections = _resolve_roots(config, query, collection)
     if not roots:
-        return {"status": "disabled", "reason": "no existing retrieval roots", "results": ""}
+        return {
+            "status": "disabled",
+            "reason": "no existing retrieval roots",
+            "collection": collection,
+            "results": "",
+        }
 
     top_k = max(1, min(int(settings.get("top_k", 5)), 10))
     snippet_lines = max(1, min(int(settings.get("max_snippet_lines", 12)), 40))
+    if collections:
+        top_k = min(top_k, 3)
+        snippet_lines = min(snippet_lines, 8)
     threshold = max(1, int(settings.get("semantic_file_threshold", 80)))
-    query = build_recall_query(task)
     document_count = _document_count(roots, threshold + 1)
     use_semble = document_count > threshold and shutil.which("semble") is not None
     chunks: list[str] = []
@@ -135,14 +175,28 @@ def recall_prior_notes(task: TaskEnvelope, config: HarnessConfig) -> dict[str, A
             pattern = "|".join(re.escape(term) for term in terms)
             for root in roots:
                 completed = subprocess.run(
-                    [rg, "-n", "-i", "-g", "*.md", "-g", "*.txt", "-g", "*.rst", pattern, str(root)],
+                    [
+                        rg,
+                        "-n",
+                        "-i",
+                        "--max-count",
+                        "2000",
+                        "-g",
+                        "*.md",
+                        "-g",
+                        "*.txt",
+                        "-g",
+                        "*.rst",
+                        pattern,
+                        str(root),
+                    ],
                     text=True,
                     errors="replace",
                     capture_output=True,
                     check=False,
                     timeout=30,
                 )
-                lines = completed.stdout.splitlines()[:line_limit]
+                lines = _rank_lines(completed.stdout.splitlines(), terms, line_limit)
                 if lines:
                     chunks.append(f"## {root}\n" + "\n".join(lines))
             tool = "rg"
@@ -155,9 +209,14 @@ def recall_prior_notes(task: TaskEnvelope, config: HarnessConfig) -> dict[str, A
         "tool": tool,
         "query": query,
         "roots": [str(root) for root in roots],
+        "collections": collections,
         "document_count_lower_bound": document_count,
         "results": "\n\n".join(chunk for chunk in chunks if chunk).strip(),
     }
+
+
+def recall_prior_notes(task: TaskEnvelope, config: HarnessConfig) -> dict[str, Any]:
+    return recall_query(build_recall_query(task), config)
 
 
 def prepare_kickoff(task: TaskEnvelope, config: HarnessConfig) -> dict[str, Any]:

@@ -14,6 +14,7 @@ problems and none replaces challenge-specific verification. The project skill
 | CodeBurn | Measure token and cost history | Baseline and milestone only |
 | Caveman | Shorten natural-language output | Skill-only, explicit `lite` mode |
 | Impeccable | Audit and improve frontend UI | Off for ordinary CTF solving |
+| RAG-Anything | Retrieve from PDFs, Office files, images, tables, and equations | Offline, pre-indexed collections only |
 
 ## Ponytail
 
@@ -77,6 +78,26 @@ ast-grep run -p 'subprocess.run($$$ARGS)' -l python src
 
 Restrict the path and language. Treat matches as an index and read the original
 source span before building a PoC.
+
+## RAG-Anything
+
+Use RAG-Anything only as an offline multimodal layer over a pre-synchronized
+corpus. Exact strings still go to `rg`; unknown concepts in text go to Semble;
+PDF, Office, image, table, or equation questions may use RAG-Anything. Do not
+register it as an always-on MCP server or index live flags, credentials, cookies,
+or private challenge artifacts.
+
+The ENKI collection is allowlisted in `corpora/enki/sources.json`:
+
+```powershell
+.\scripts\ctf-harness.ps1 corpus-sync --collection enki
+.\scripts\ctf-harness.ps1 recall "side channel using proc self io" --collection enki
+```
+
+The sync keeps raw public material locally and writes a bounded retrieval copy
+with historical flag-shaped values masked. The raw source remains available for
+provenance checks. Index the local raw directory with RAG-Anything before an
+event, then return at most three source-linked leads to a worker.
 
 ## Headroom
 

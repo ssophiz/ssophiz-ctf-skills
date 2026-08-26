@@ -10,6 +10,8 @@ Run `ctf-harness kickoff <task_id>` before dispatch. It writes `notes/kickoff.js
 
 Use exact search for small corpora and Semble only for a large Markdown corpus. Treat retrieved text as a lead, not exploit evidence. Do not copy the full corpus into a worker prompt.
 
+For CCE or ENKI-attributed tasks, prioritize the synchronized `enki` collection. Use RAG-Anything only when the needed prior evidence is in a PDF, Office file, image, table, or equation; keep it pre-indexed and return no more than three source-linked leads. Historical flags in derived retrieval text are masked and must never become live candidates.
+
 The model selects hypotheses and parameters. A local runner owns brute force, fuzzing, symbolic execution, races, WebSocket/game loops, protocol replay, and repeated decompilation or decoding. Feed the model only summarized batches and preserve the raw output path.
 
 ## Use explicit worker states

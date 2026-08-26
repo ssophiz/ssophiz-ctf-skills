@@ -17,6 +17,13 @@
   },
   "retrieval": {
     "roots": ["docs", "${SSOPHIZ_CTF_CORPUS}"],
+    "collections": [
+      {
+        "name": "enki",
+        "root": ".harness/corpora/enki/retrieval",
+        "keywords": ["cce", "enki", "엔키", "codegate", "fiesta"]
+      }
+    ],
     "semantic_file_threshold": 80,
     "top_k": 5,
     "max_snippet_lines": 12
