@@ -21,6 +21,10 @@ Keep these claims separate:
 - served assets say what this instance executes;
 - captured traffic says what the server accepted.
 
+Treat cache keys and request URLs as leads, not response evidence. Parse the cached status line, headers, content encoding, and body together; an entry named like an API or telemetry route may contain only a framework 404 page. Record the cache source, entry offset or key, status, and decoded-body hash before using it as protocol evidence.
+
+For replay-driven games, recover both the replay-list contract and the manifest fetch. The client bundle may reveal polling cadence, `manifestUrl`, credentials mode, frame interval, validators, and racer fields while the actual manifest is absent because it was fetched with `no-store`. In that case, preserve the contract but keep pace, wear, service timing, and other server physics underdetermined until a real manifest or authoritative frame series is available.
+
 ## Derive the smallest client
 
 Reproduce one accepted interaction before adding automation:

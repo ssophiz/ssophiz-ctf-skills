@@ -16,6 +16,14 @@ Track where each parser consumes bytes and where buffering changes line or frame
 
 Identify the stale reference, object lifetime transition, allocation class, and controllable replacement object. Instrument allocations and reference counts when possible. A crash after free is only a primitive; require a repeatable reclaim and a controlled field before building the final chain.
 
+For input-driven fake chunks, preserve the exact accepted bytes and the parser result that produced each metadata byte. After a fake chunk reaches a tcache or freelist, do not assume the same parser can safely edit its encoded link: if the edit path frees or resolves the object again, first test for allocator consistency failures. An immediate double-free or `!prev` abort means the next experiment is a resolver-free write or allocator-state cleanup, not a different target address.
+
+When a kernel race leaves two live handles pointing to one slab object, separate alias proof from replacement proof. Gate the replacement allocator on the exact freed address and verify that the intended object owns the slot before triggering the second free. A SLUB double-free guard at the held address proves co-aliasing, but also proves that the replacement did not win that allocation.
+
+## Privileged FUSE connections
+
+Opening a fresh `/dev/fuse` file descriptor does not attach it to an existing daemon connection. Before treating clone or fusectl operations as a privilege boundary, verify mount ownership, access to the daemon's file-descriptor table, visibility of the fusectl connection, and whether the clone ioctl requires an already attached descriptor in the caller's own table. Preserve one dynamic permission probe and the matching ioctl call-site evidence.
+
 ## Timing-sensitive kernel races
 
 Write down the two orders the exploit must align: object or archive traversal order, and workqueue or callback execution order. Use debugger traces or kernel logs to prove refcount and lifetime transitions. Increase reliability by controlling scheduling inputs and heap state rather than adding arbitrary sleeps.

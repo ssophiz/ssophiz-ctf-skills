@@ -7,18 +7,19 @@ logs, local test flags, and generated evidence remain ignored by Git.
 
 ## Outcome
 
-No genuine competition flag was recovered after the event. The recovery did,
-however, complete the local mail-server exploit, make the Lease Journal race
-deterministic, and identify the first exact allocator invariant blocking the
-current nsprobe route.
+No genuine competition flag was recovered after the event. A second independent
+current-model pass completed the local mail-server reproduction again, recovered
+an overlooked replay-client contract, proved a same-slot Lease Journal co-alias,
+and produced a separate resolver-safe nsprobe tcache primitive. PiEEE remained
+blocked after a fresh FUSE-connection and object-map audit.
 
 | Challenge | Offline recovery result | Remaining blocker |
 |---|---|---|
-| PiEEE | 54 bounded FUSE replies produced no disclosure, useful overwrite, or reachable executable pointer | No primitive that preserves the object header |
-| nsprobe | Reproducible controlled editor at `H-0x20` across ASLR-varying runs | The next allocation aborts with `malloc(): invalid size (unsorted)` |
-| Lease Journal | Expiry/compaction stale alias reproduced deterministically with `PASS/PASS` evidence | kmalloc-192 reclaim and the final overlap remain stochastic |
-| GRID | Local protocol and assets were exhausted | Required server-side pace, wear, and service telemetry was absent |
-| Mail server | ASLR-enabled local exploit recovered the supplied dummy flag | The former server was unavailable, so no competition flag could be read |
+| PiEEE | Fresh device and ioctl probes proved that an unprivileged process can open only unbound FUSE descriptors and cannot reach the daemon connection | No non-mangled live object was proven from the recovered write-helper callers |
+| nsprobe | A parser-accepted numeric input forges a valid small fake chunk and places it in a deterministic tcache chain | The first encoded-link edit aborts with `double free or corruption (!prev)` |
+| Lease Journal | Two stale interleavings now produce two live leases aliasing the same kmalloc-192 blob | The intended replacement object had not reclaimed the exact slot before the second free |
+| GRID | An overlooked replay-list and manifest-fetch contract was recovered from the served client cache | No replay manifest or authoritative telemetry frame series survived locally |
+| Mail server | A fresh ASLR-enabled local target again reproduced the supplied test-flag read | Saved reports and captures contained no competition flag attributable to this challenge |
 
 ## Lease Journal: race primitive resolved
 
@@ -62,6 +63,46 @@ The process aborts before the `H+0x20` record exists. Consequently, the
 proposed `0x500974` mutation and `lookup(10)` endgame remain unproven. A future
 attempt should change the allocator state before parking the adjacent editor,
 not add more retries to the same malformed-unsorted path.
+
+The independent source-first pass found a separate small-bin route. A
+zero-padded legacy numeric address survives resolver validation while supplying
+the byte needed for a valid small fake-chunk header. The fake chunk can be freed
+into a deterministic tcache chain, but the first attempt to edit its encoded
+link through the same resolver lifecycle stops at:
+
+```text
+double free or corruption (!prev)
+```
+
+This narrows the next experiment to a resolver-free link overwrite or an
+allocator-state cleanup. It does not establish an arbitrary allocation.
+
+## Lease Journal: same-slot co-alias resolved
+
+The second pass extended the deterministic stale alias into two live leases
+that reference the same kmalloc-192 blob. Exact-address tracing then showed the
+second pipe resize freeing that held address before the intended message object
+owned it, causing the SLUB double-free guard. This proves the co-alias and the
+failed reclaim in one run. A future attempt should gate the replacement
+allocation on the exact held address before triggering the matching resize,
+rather than rerunning the already-solved scheduling race.
+
+## GRID: replay contract recovered
+
+The cache audit recovered the served replay client and its replay-list,
+manifest-fetch, polling, and fixed-frame validation contract. The apparent
+telemetry cache entries were framework 404 pages, not race telemetry. Because
+the real manifests were fetched without durable caching, no authoritative pace,
+wear, service, or flag evidence survived. The local controller therefore
+remains an underdetermined sensitivity model, not a verified solve.
+
+## PiEEE: fresh FUSE route exhausted
+
+The unprivileged process could open new `/dev/fuse` descriptors but could not
+inspect the daemon file-descriptor table or fusectl connection. Static ioctl
+recovery confirmed that cloning requires an already attached descriptor in the
+caller's own table. The write matcher and its filesystem callers were mapped,
+but no usable non-mangled lifetime object was proven within the bounded pass.
 
 ## Other bounded results
 
