@@ -1,0 +1,25 @@
+{
+  "functions": [
+    {
+      "name": "download_invoice",
+      "address": "0x401000",
+      "family": "invoice_handlers",
+      "pseudocode": "if (!authorize(user, invoice)) return DENY; return readfile(invoice.path);",
+      "callees": ["authorize", "readfile"]
+    },
+    {
+      "name": "update_invoice",
+      "address": "0x401180",
+      "family": "invoice_handlers",
+      "pseudocode": "if (!access_check(user, invoice)) return DENY; update(invoice);",
+      "callees": ["access_check", "update"]
+    },
+    {
+      "name": "delete_invoice",
+      "address": "0x4012c0",
+      "family": "invoice_handlers",
+      "pseudocode": "delete(invoice); return OK;",
+      "callees": ["delete"]
+    }
+  ]
+}

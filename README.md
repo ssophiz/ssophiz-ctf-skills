@@ -5,6 +5,24 @@ authorized CTF competitions. The public repository deliberately excludes
 flags, credentials, pairing codes, live event workspaces, and raw challenge
 artifacts.
 
+## GuardLens Variant Hunter
+
+GuardLens is an evidence-gated missing-guard variant hunter for authorized
+binary and source review. It compares sibling functions, derives repeated guard
+invariants, and ranks only inconsistencies that also reach a sensitive operation.
+Each result includes a guard matrix, peer support, confidence, and reproducible
+match evidence.
+
+```powershell
+python -m pip install -e ".[dev]"
+guardlens examples/guardlens/sample_handlers.json -o guardlens-report.json
+python -m unittest tests.test_guardlens -v
+```
+
+The current MVP is deterministic and reviewable; it does not claim that a
+candidate is a confirmed vulnerability. See [docs/GUARDLENS.md](docs/GUARDLENS.md)
+for the input contract, IDA workflow, limitations, and extension path.
+
 ## Agent skills
 
 The `skills/` directory follows the `SKILL.md` frontmatter convention used by
