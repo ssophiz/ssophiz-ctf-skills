@@ -49,6 +49,33 @@ This repository also ships project-scoped Codex defaults in
 disabled Apps/web search, and two nested subagents at most. Explicit Orca wave
 settings still override reasoning effort when escalation is required.
 
+### Low-context Pi worker
+
+Install the pinned Pi CLI and checksum-verified Hypa binary, then authenticate
+the isolated CTF profile once:
+
+```powershell
+.\scripts\install-pi-ctf.ps1
+.\scripts\start-pi-ctf.ps1 -Category web -Login
+```
+
+Use Pi for bounded triage or one concrete analysis path. The launcher loads one
+category skill, disables unrelated extensions and project context, exposes only
+four built-in tools, and uses an ephemeral session by default:
+
+```powershell
+.\scripts\start-pi-ctf.ps1 `
+  -Category realtime-web-game `
+  -Workspace .\work\current-game `
+  -Thinking medium
+```
+
+Add `-Interactive` for a continuing TUI session or `-KeepSession` for a saved
+one-shot run. Hypa remains an explicit CLI for large repetitive non-evidence
+output; its Pi extension and automatic shell rewriting are deliberately not
+installed. Exact flags, credentials, hashes, addresses, offsets, payloads, and
+decisive errors must come from raw output.
+
 ## Live evidence ledger
 
 Solver workers can preserve decisive commands, PoC paths, key output, flag

@@ -88,6 +88,8 @@ def command_doctor(args: argparse.Namespace) -> int:
         "orca": _version(str(config.data["orca"]["executable"]), "--version"),
         "codex": _version("codex", "--version"),
         "claude": _version("claude", "--version"),
+        "pi": _version("pi", "--version"),
+        "hypa": _version("hypa", "--version"),
         "ollama": _version("ollama", "--version"),
         "wsl": _version("wsl", "--version"),
         "worker_image": {"available": False, "name": config.runtime["worker_image"]},

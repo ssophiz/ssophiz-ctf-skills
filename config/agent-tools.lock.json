@@ -1,4 +1,20 @@
 {
+  "pi": {
+    "package": "@earendil-works/pi-coding-agent",
+    "version": "0.84.4",
+    "source": "https://github.com/earendil-works/pi",
+    "commit": "b79e4cc834970cca69daebffab7df1da7d1e52c4",
+    "integrity": "sha512-jmOlrqUmvhh/siNWFRXjYLJzhKFIHNsAQaysRwzQPQFnPAaV/vhqHsLH/MBsIISA1Rjj7WTUFR3nJrpXoLx39w==",
+    "install": "npm-global-ignore-scripts-isolated-ctf-profile"
+  },
+  "hypa": {
+    "version": "0.1.14",
+    "source": "https://github.com/Hypabolic/Hypa",
+    "commit": "2678616e62f1f2a8d2ae0904f88859c3f19df860",
+    "windows_x64_sha256": "8fc1e9a478619157c896fd9419244ee7d875b73cbc9150d2f4c724b7ce62ba41",
+    "windows_arm64_sha256": "cee0b55e44928777574356d0ee0804b8fc71fe55ed1aa7b18c0fc2f36b29fb56",
+    "install": "verified-release-binary-explicit-cli"
+  },
   "ponytail": {
     "version": "4.9.0",
     "source": "https://github.com/DietrichGebert/ponytail",

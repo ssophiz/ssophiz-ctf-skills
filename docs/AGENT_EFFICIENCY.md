@@ -1,11 +1,13 @@
 # Agent context-efficiency tools
 
-This repository supports eight optional third-party tools. They solve different
+This repository supports optional third-party tools. They solve different
 problems and none replaces challenge-specific verification. The project skill
 `ctf-token-efficiency` routes them without compressing exact exploit evidence.
 
 | Tool | Use | CTF default |
 |---|---|---|
+| Pi | Minimal coding-agent worker | Isolated one-skill, four-tool, ephemeral profile |
+| Hypa | Deterministically reduce large command output | Explicit CLI only; no Pi hook |
 | Ponytail | Avoid unnecessary implementation | On-demand skill; `lite` during research |
 | Graphify | Query a source-code knowledge graph | Use for cross-file questions only |
 | Semble | Retrieve small relevant code or documentation snippets | CLI only; use when the symbol is unknown |
@@ -15,6 +17,49 @@ problems and none replaces challenge-specific verification. The project skill
 | Caveman | Shorten natural-language output | Skill-only, explicit `lite` mode |
 | Impeccable | Audit and improve frontend UI | Off for ordinary CTF solving |
 | RAG-Anything | Retrieve from PDFs, Office files, images, tables, and equations | Offline, pre-indexed collections only |
+
+## Pi CTF lane
+
+Pi is a secondary low-context worker, not the coordinator. The pinned installer
+creates `~/.pi/ctf-agent` with no packages, extensions, global skills, prompts,
+or themes. The launcher then supplies exactly one category skill and the strict
+tool allowlist `read,powershell,edit,write` on Windows. It also disables project
+context files and trust, enables long provider cache retention, suppresses
+version/telemetry startup traffic, allows one short agent retry, and caps a
+provider-requested retry delay at ten seconds.
+
+```powershell
+.\scripts\install-pi-ctf.ps1
+.\scripts\start-pi-ctf.ps1 -Category web -Login
+.\scripts\start-pi-ctf.ps1 -Category web -Workspace C:\path\to\task
+```
+
+The default run is one-shot and ephemeral. Use `-Interactive` only when human
+steering matters, and `-KeepSession` only when a concrete investigation must
+continue. Do not carry a Pi session between challenges. Use `-Shell bash` only
+inside an environment where the selected Bash is the intended CTF shell;
+otherwise let PowerShell call `wsl.exe` explicitly.
+
+The login is isolated from normal `~/.pi/agent` credentials. Authenticate once
+with `/login openai-codex` when the launcher opens Pi. Authentication material
+is never copied into this repository.
+
+## Hypa
+
+The installer downloads the platform release archive, verifies its pinned
+SHA-256 value, and places `hypa.exe` under `~/.local/bin`. Hypa is not installed
+as a Pi extension: automatic bash rewriting plus extra tool schemas would
+undercut the minimal worker surface. Use it explicitly for repetitive build,
+test, Docker, package-manager, or infrastructure output:
+
+```powershell
+hypa -c "docker build -t ctf-worker ."
+hypa filters savings --min-saved 100
+```
+
+Never use a reduced stream as exploit evidence. For a candidate flag, hash,
+address, offset, payload, credential, or decisive error, rerun the smallest
+direct command and save its raw output in the task workspace.
 
 ## Ponytail
 
@@ -165,6 +210,12 @@ Web, Pwn, Reverse, Crypto, Forensics, Malware, or Misc analysis.
   overlaps this repository's orchestrator and would add turns during a
   time-boxed competition.
 - Codex Security is a separate product capability, not a local CTF skill.
+- Oh My Pi is not the default CTF lane. Its broad built-in tool surface is useful
+  for general development but conflicts with the goal of a minimal worker.
+- `pai-acp`, `pi-smart-compact`, `pi-context`, and `pi-press` are not installed.
+  Native Pi compaction plus phase-boundary evidence handoffs are sufficient for
+  the initial lane; the alternatives add model calls, tools, or another context
+  authority and require separate measurement before live-event use.
 
 ## Installation
 
@@ -184,6 +235,12 @@ The script installs the versions in `config/agent-tools.lock.json`, enables
 Codex multi-agent support for Graphify, performs a project-scoped Graphify
 registration, installs shared skills for Codex and Claude Code, and verifies
 all command-line tools.
+
+Install the separate minimal Pi lane without reinstalling the other tools:
+
+```powershell
+.\scripts\install-pi-ctf.ps1
+```
 
 ## CTF privacy boundary
 
