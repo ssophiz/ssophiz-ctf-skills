@@ -26,6 +26,7 @@ ctf-sandbox-mcp = "ssophiz_ctf.mcp_sandbox:main"
 ctf-ida-mcp = "ssophiz_ctf.mcp_ida:main"
 ctf-web-mcp = "ssophiz_ctf.mcp_web:main"
 ctf-verifier-mcp = "ssophiz_ctf.mcp_verifier:main"
+guardlens = "ssophiz_ctf.guardlens:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
