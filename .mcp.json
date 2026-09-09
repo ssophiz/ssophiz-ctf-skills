@@ -4,35 +4,40 @@
       "command": "scripts\\project-venv-python.cmd",
       "args": ["-m", "ssophiz_ctf.mcp_control"],
       "env": {
-        "SSOPHIZ_CONFIG": "config/harness.json"
+        "SSOPHIZ_CONFIG": "config/harness.json",
+        "SSOPHIZ_MCP_SCOPE": "control"
       }
     },
     "ctf-artifact": {
       "command": "scripts\\project-venv-python.cmd",
       "args": ["-m", "ssophiz_ctf.mcp_artifact"],
       "env": {
-        "SSOPHIZ_CONFIG": "config/harness.json"
+        "SSOPHIZ_CONFIG": "config/harness.json",
+        "SSOPHIZ_MCP_SCOPE": "artifact"
       }
     },
     "ctf-sandbox": {
       "command": "scripts\\project-venv-python.cmd",
       "args": ["-m", "ssophiz_ctf.mcp_sandbox"],
       "env": {
-        "SSOPHIZ_CONFIG": "config/harness.json"
+        "SSOPHIZ_CONFIG": "config/harness.json",
+        "SSOPHIZ_MCP_SCOPE": "sandbox"
       }
     },
     "ctf-ida": {
       "command": "scripts\\project-venv-python.cmd",
       "args": ["-m", "ssophiz_ctf.mcp_ida"],
       "env": {
-        "SSOPHIZ_CONFIG": "config/harness.json"
+        "SSOPHIZ_CONFIG": "config/harness.json",
+        "SSOPHIZ_MCP_SCOPE": "ida"
       }
     },
     "ctf-web": {
       "command": "scripts\\project-venv-python.cmd",
       "args": ["-m", "ssophiz_ctf.mcp_web"],
       "env": {
-        "SSOPHIZ_CONFIG": "config/harness.json"
+        "SSOPHIZ_CONFIG": "config/harness.json",
+        "SSOPHIZ_MCP_SCOPE": "web"
       }
     }
   }
