@@ -1,0 +1,59 @@
+version: 1
+policy: shallow-first
+
+# Routing must be cheaper than solving. Never spend frontier-model reasoning on
+# choosing a specialist unless deterministic routing remains ambiguous after a
+# bounded fallback.
+router:
+  primary: deterministic
+  max_router_tokens: 180
+  max_candidates: 2
+  deep_router: false
+
+signals:
+  extension:
+    elf: [pwn, reverse]
+    exe: [reverse, malware]
+    dll: [reverse, malware]
+    pcap: [forensics]
+    pcapng: [forensics]
+    evtx: [forensics]
+    mem: [forensics]
+    img: [forensics]
+    apk: [reverse]
+    so: [reverse, pwn]
+    py: [web, misc]
+    js: [web]
+    wasm: [reverse, web]
+  lexical:
+    web: [http, https, cookie, jwt, flask, django, express, nginx, websocket, ssti, sqli, xss, csrf]
+    pwn: [elf, libc, heap, stack, canary, rop, seccomp, format-string, overflow]
+    reverse: [decompile, disassemble, ida, ghidra, opcode, vm, obfuscation, crackme]
+    crypto: [rsa, ecc, aes, nonce, oracle, ciphertext, lattice, modular]
+    forensics: [pcap, memory, disk, registry, evtx, timeline, filesystem, artifact]
+    malware: [malware, loader, beacon, unpack, yara, persistence, c2]
+    realtime-web-game: [websocket, sse, race, toctou, scheduler, game, realtime]
+
+fallback:
+  # If top two deterministic scores are close, do not deeply reason about
+  # taxonomy. Dispatch at most two plausible specialists for a tiny probe and
+  # keep the one that produces evidence first.
+  ambiguity_margin: 1
+  probe_budget:
+    input_tokens: 500
+    output_tokens: 180
+    max_tool_calls: 2
+  race_specialists: true
+  stop_on_first_evidence: true
+
+feedback:
+  enabled: true
+  store_only:
+    - challenge_features
+    - chosen_skill
+    - produced_evidence
+    - solved
+    - tokens
+    - wall_clock_ms
+  # Future routing should learn from observed outcomes, not longer prompts.
+  prefer_empirical_prior: true
