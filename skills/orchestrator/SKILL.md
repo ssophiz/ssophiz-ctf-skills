@@ -11,6 +11,10 @@ For live-event ownership, worker states, evidence minimums, failover, and reassi
 
 Use `ctf-control` to record decisions and evidence. Use `ctf-artifact` to inspect or share task-scoped files. Browser access is for the supplied CTF platform or endpoints only; capture a screenshot or source excerpt when it materially changes routing.
 
+Use `ctf-state-capsule` at every phase boundary. Do not replay full worker transcripts into a new model. Start the next worker from the challenge statement, a five-line state capsule, and only the raw evidence spans it explicitly requests. Keep at most three active hypotheses after triage and two during an ordinary solve wave. Require each hypothesis to name one cheap falsification experiment.
+
+Apply `config/token-budget.yaml` as a soft budget. Prefer deterministic extraction, exact search, parsing, emulation, replay, and bounded retrieval before spending reasoning tokens. Escalate only when the current state capsule contains a concrete blocker. Stop duplicate workers as soon as one path has reproducible evidence.
+
 During the event, require each solver to call `record_evidence` with only the decisive commands, workspace-relative PoC paths, short key output, candidate flags, and ordered reproduction steps. Do not ask workers for prose write-ups. At event close, run `ctf-harness evidence-pdf` once to batch the per-challenge ledger into the final PDF.
 
 Keep Pwn, Reverse, and Web work independent until a concrete handoff exists. Examples include a leaked binary from Web, a decryption routine from Reverse, or an endpoint protocol identified by Pwn. Record the handoff as a finding with source paths and the next worker's question.
