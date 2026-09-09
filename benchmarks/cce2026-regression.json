@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "purpose": "Sanitized routing and speed regression cases. No flags, credentials, live endpoints, or raw challenge artifacts.",
+  "metrics": [
+    "time_to_first_primitive_seconds",
+    "time_to_first_flag_seconds",
+    "total_tokens",
+    "tokens_per_flag",
+    "score_per_1k_tokens",
+    "tool_calls",
+    "duplicate_worker_seconds"
+  ],
+  "cases": [
+    {
+      "id": "cce2026-grid-style",
+      "description": "Realtime browser/game challenge using WebSocket telemetry and repeated steering/control decisions.",
+      "expected_route": "realtime-web-game",
+      "expected_lane": "fast",
+      "requirements": [
+        "detect latency-sensitive protocol without deep router reasoning",
+        "transition from browser observation to deterministic direct client quickly",
+        "model must not manually drive the hot loop",
+        "record first protocol or control primitive time"
+      ],
+      "targets": {
+        "route_decision_seconds_max": 2,
+        "model_tool_calls_before_runner_max": 5
+      }
+    },
+    {
+      "id": "cce2026-lease-journal-style",
+      "description": "Kernel/pwn challenge where a timing-sensitive lifetime/refcount hypothesis must be validated with repeated deterministic execution.",
+      "expected_route": "pwn",
+      "expected_lane": "staged_then_ultra_if_blocked",
+      "requirements": [
+        "identify kernel/pwn route from artifact and vocabulary without deep routing",
+        "measure time to first concrete lifetime/race primitive",
+        "run repeated timing experiments outside the model",
+        "permit ultra escalation only after a concrete blocker and cheap-path exhaustion"
+      ],
+      "targets": {
+        "active_hypotheses_max": 3,
+        "no_evidence_steps_before_worker_kill_max": 3
+      }
+    }
+  ]
+}

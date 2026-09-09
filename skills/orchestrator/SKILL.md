@@ -5,7 +5,7 @@ description: Coordinate authorized CTF tasks across specialist workers, preservi
 
 # CTF orchestrator
 
-Treat the task contract as the complete authorization boundary. First normalize the challenge, list artifacts and endpoints, then dispatch the smallest useful set of specialists.
+Treat the task contract as the complete authorization boundary. First normalize the challenge, list artifacts and endpoints, then route with `ctf-router`. Routing must remain shallow: deterministic signals first, at most two tiny probes on ambiguity, and no deep reasoning merely to decide which specialist to launch.
 
 For live-event ownership, worker states, evidence minimums, failover, and reassignment rules, read [references/live-event-operations.md](references/live-event-operations.md).
 
@@ -18,5 +18,7 @@ Keep Pwn, Reverse, and Web work independent until a concrete handoff exists. Exa
 Route explicit real-time browser games, WebSocket or SSE state machines, served-bundle recovery, server-paced simulations, and request-order races to `ctf-realtime-web-game`. It owns the browser-to-direct-client transition and local hot loop; generic Web work should not duplicate that loop.
 
 Do not run analysis commands directly from this role, request verifier access, or submit flags. A candidate needs an attached reproduction path before it moves to verifier review.
+
+At each phase boundary, replace accumulated prose history with a compact `ctf-state-capsule` plus evidence paths. Preserve raw exact values in workspace evidence rather than summaries.
 
 At event close, hand the evidence ledger and final write-up to `ctf-postmortem` for private reconciliation and public-safe skill distillation.

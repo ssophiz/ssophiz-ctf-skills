@@ -5,29 +5,31 @@ description: Reduce model context and output during authorized CTF triage, multi
 
 # CTF token efficiency
 
-Save raw challenge inputs and tool output to the task workspace before summarizing them. Treat compression as an index into evidence, never as evidence itself.
+Save raw challenge inputs and tool output to the task workspace before summarizing them. Treat compression as an index into evidence, never as evidence itself. Apply the soft limits in `config/token-budget.yaml` and use `ctf-state-capsule` at phase boundaries.
 
 Route work by need:
 
-- Use the isolated Pi CTF profile for a bounded, low-context classification or
-  single-path analysis worker. Load exactly one category skill, disable global
-  extensions and context files, and use an ephemeral session unless a concrete
-  investigation must continue across turns. Keep Codex/Orca as coordinator.
+- Use the isolated Pi CTF profile for a bounded, low-context classification or single-path analysis worker. Load exactly one category skill, disable global extensions and context files, and use an ephemeral session unless a concrete investigation must continue across turns. Keep Codex/Orca as coordinator.
 - Use `rg` or a direct read for a small source tree, exact string, one file, or one known symbol.
 - Use Semble CLI only when the tree is large or unfamiliar and the concept is known but the file or symbol is not. Keep retrieval bounded, for example `semble search "authorization flow" . --top-k 5 --max-snippet-lines 12`. Use `--content docs` for prior Markdown notes. Do not register its MCP server by default.
 - Use Graphify for cross-file architecture, call-path, and dependency questions when a project graph exists.
 - Use ast-grep for a repeated structural code pattern that text search cannot express precisely. Restrict the language and path, then open the original matched span before using it as exploit evidence.
 - Use Headroom only for large, repetitive listings, JSON, logs, or transcripts. Retrieve the original span before using an exact value in a PoC or verifier.
-- Use Hypa only for large repetitive command output where deterministic local
-  reduction helps. Do not pass candidate flags, credentials, hashes, addresses,
-  offsets, payloads, or decisive errors through a reducer; rerun a narrow direct
-  command and preserve its raw output instead. Do not install Hypa's Pi extension
-  by default because its extra tools and automatic bash rewriting enlarge and
-  alter the minimal worker surface.
+- Use Hypa only for large repetitive command output where deterministic local reduction helps. Do not pass candidate flags, credentials, hashes, addresses, offsets, payloads, or decisive errors through a reducer; rerun a narrow direct command and preserve its raw output instead. Do not install Hypa's Pi extension by default because its extra tools and automatic bash rewriting enlarge and alter the minimal worker surface.
 - Use Caveman `lite` for compact progress updates and worker handoffs. Keep code, commands, warnings, reports, and reproduction steps in normal precise language. Do not enable Caveman proxy hooks together with Ponytail hooks.
 - Use CodeBurn at a baseline or milestone, not every turn. It measures token use but does not reduce it.
 - Use Impeccable only for a requested frontend, dashboard, or report-viewer task. Never load it for ordinary Web, Pwn, Reverse, Crypto, Forensics, Malware, or Misc solving.
 - Keep one installed copy of each skill per agent discovery path. Codex does not merge duplicate skill names, so duplicate `.agents` and legacy `.codex` copies waste discovery context.
+
+## Token-first solving loop
+
+1. Run deterministic triage before model reasoning: file type, metadata, strings, imports, routes, headers, archive inventory, obvious encodings, and supplied endpoint behavior.
+2. Form no more than three hypotheses. Rank by expected information gain divided by cost.
+3. For each hypothesis, run the cheapest falsification experiment first. Do not ask a model to reason over data a local command can reduce deterministically.
+4. Retrieve only the source span needed for the surviving hypothesis. Never dump the full repository or full decompiler output into context.
+5. At a phase boundary, replace history with a `ctf-state-capsule` and evidence paths.
+6. Escalate model effort only after a concrete blocker survives cheap tests.
+7. Record tokens, tool calls, wall-clock time, and whether the phase produced a new primitive or flag. Optimize tokens-per-flag, not brevity for its own sake.
 
 Never transform candidate flags, credentials, cryptographic material, hashes, memory addresses, offsets, ROP chains, shellcode, serialized payloads, exact HTTP requests, exploit commands, stack traces, or the shortest decisive error line. Copy these verbatim and include the raw evidence path.
 

@@ -18,7 +18,7 @@ EXTENSION_CATEGORY = {
 }
 
 KEYWORD_CATEGORY = {
-    "pwn": ("buffer overflow", "rop", "heap", "shellcode", "libc", "pwntools"),
+    "pwn": ("buffer overflow", "rop", "heap", "shellcode", "libc", "pwntools", "kernel", "refcount", "use-after-free", "uaf"),
     "reverse": ("reverse", "decompile", "crackme", "android", "binary"),
     "malware": ("malware", "ransomware", "loader", "dropper", "c2", "command and control"),
     "web": ("http", "website", "login", "cookie", "api", "ssrf", "ssti", "xss"),
@@ -65,7 +65,7 @@ FIRST_CHECKS = {
 }
 
 MACHINE_LOOPS = {
-    "pwn": "pwntools/GDB runner owns crashes, offsets, heap shaping, races, and retries",
+    "pwn": "pwntools/GDB/QEMU runner owns crashes, offsets, heap shaping, races, and retries",
     "reverse": "batch disassembler, emulator, tracer, or solver owns repeated execution",
     "malware": "isolated decoder or bounded sandbox runner owns repeated extraction",
     "web": "direct HTTP/WebSocket client owns enumeration, races, replay, and timing samples",
@@ -135,4 +135,13 @@ def build_speed_plan(task: TaskEnvelope, assignments: list[dict[str, Any]]) -> d
         ),
         "model_job": "Choose the next hypothesis from summarized batches; do not manually drive the hot loop.",
         "stop": "Publish a directly observed, evidence-linked candidate or one concrete blocker.",
+        "measure": [
+            "time_to_first_primitive_seconds",
+            "time_to_first_flag_seconds",
+            "score_per_minute",
+            "tokens_per_flag",
+            "duplicate_worker_seconds",
+        ],
+        "worker_kill": "Stop after 3 consecutive no-new-evidence steps, duplicate reproducible evidence, or budget exhaustion.",
+        "ultra_gate": "Require a concrete evidence-linked blocker plus cheap-path exhaustion; never escalate from vague failure alone.",
     }
