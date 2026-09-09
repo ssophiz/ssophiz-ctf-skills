@@ -89,3 +89,16 @@ Do not use another LLM to decide which LLM to use unless cheap deterministic rou
 6. reserve Ultra/frontier-high effort for a concrete high-value blocker.
 
 Measure provider value with end-to-end metrics: `TTFP`, `TTFF`, score/minute, tokens/flag, score/1k tokens, and duplicate-worker time. A second provider stays enabled only if it improves those metrics on held-out CTF problems.
+
+## Local checkout workflow
+
+Keep provider secrets only in the local environment or ignored `config/harness.json`. To pull this branch on a competition machine:
+
+```powershell
+git fetch origin feat/token-efficient-solver-v2
+git switch feat/token-efficient-solver-v2
+git pull --ff-only
+Copy-Item config/harness.example.json config/harness.json
+```
+
+Then set only the provider variables you intend to use and run `scripts/ctf-harness.ps1 doctor`. Z.ai is reached directly from the local harness through its OpenAI-compatible API; it is not proxied through MCP.
