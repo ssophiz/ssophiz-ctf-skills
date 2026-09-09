@@ -25,3 +25,13 @@ Measure:
 - solve rate under a fixed global token budget
 
 Compare deterministic-only, deterministic+two-probe, and LLM-router baselines. A better router is one that improves end-to-end CTF efficiency, not merely category accuracy.
+
+## Working hypothesis
+
+Do not optimize routing accuracy first. Optimize expected end-to-end solving cost:
+
+`E[cost] = route_cost + probe_cost + recovery_cost + solve_cost`
+
+A shallow router may be slightly less accurate than a deep classifier and still win if its wrong-route recovery is cheap. This is especially plausible in CTFs because many challenges expose strong artifact and protocol signals before semantic reasoning is necessary.
+
+Use empirical route outcomes as priors only after enough solved tasks exist. Until then, deterministic rules and tiny evidence probes are the default.
