@@ -32,7 +32,7 @@
     "codex_triage": {
       "adapter": "orca",
       "agent": "codex",
-      "model": "gpt-5.6-luna",
+      "model": "gpt-6-astra",
       "effort": "low",
       "wave": 0,
       "focus": "Classify the supplied task and run at most three cheap decisive checks. Prefer metadata, known patterns, strings, imports, routes, and one mechanical extraction. Stop with QUICK, SOLVE, HARD, or BLOCKED plus one compact handoff."
@@ -40,7 +40,7 @@
     "codex_fast": {
       "adapter": "orca",
       "agent": "codex",
-      "model": "gpt-5.6-sol",
+      "model": "gpt-6-astra",
       "effort": "medium",
       "wave": 1,
       "focus": "Primary solver. Read the triage finding and artifacts first, pursue only the selected path, and save a minimal reproducible solver or one concrete blocker."
@@ -48,7 +48,7 @@
     "codex_deep": {
       "adapter": "orca",
       "agent": "codex",
-      "model": "gpt-5.6-sol",
+      "model": "gpt-6-astra",
       "effort": "xhigh",
       "wave": 2,
       "focus": "Escalation worker. Read existing findings and artifacts before acting, resolve the recorded blocker, and avoid repeating completed triage. Build a minimal reproducible solver or exploit."

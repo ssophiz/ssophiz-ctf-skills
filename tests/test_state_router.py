@@ -95,9 +95,9 @@ class StateAndRouterTests(unittest.TestCase):
         self.assertEqual([item["agent"] for item in assignments], ["codex", "codex", "codex"])
         self.assertEqual([item["wave"] for item in assignments], [0, 1, 2])
         self.assertEqual([item["profile"] for item in select_wave(assignments, 0)], ["codex_triage"])
-        self.assertEqual(assignments[0]["model"], "gpt-5.6-luna")
+        self.assertEqual(assignments[0]["model"], "gpt-6-astra")
         self.assertEqual(assignments[0]["effort"], "low")
-        self.assertEqual(assignments[1]["model"], "gpt-5.6-sol")
+        self.assertEqual(assignments[1]["model"], "gpt-6-astra")
         self.assertEqual(assignments[1]["effort"], "medium")
         self.assertEqual(assignments[2]["effort"], "xhigh")
         root = Path(__file__).parents[1]
@@ -107,7 +107,7 @@ class StateAndRouterTests(unittest.TestCase):
     def test_category_inference_prefers_artifact_signal(self) -> None:
         self.assertEqual(infer_category("no hint", ["capture.pcapng"]), "forensics")
 
-    def test_latency_sensitive_tasks_skip_luna_triage(self) -> None:
+    def test_latency_sensitive_tasks_skip_triage(self) -> None:
         config = load_config(Path(__file__).parents[1] / "config" / "harness.example.json")
         task = TaskEnvelope.create(
             name="grid racing game",
@@ -118,7 +118,7 @@ class StateAndRouterTests(unittest.TestCase):
         assignments = route_task(task, config)
         self.assertEqual([item["profile"] for item in assignments], ["codex_fast", "codex_deep"])
         self.assertEqual([item["wave"] for item in assignments], [0, 1])
-        self.assertEqual(assignments[0]["model"], "gpt-5.6-sol")
+        self.assertEqual(assignments[0]["model"], "gpt-6-astra")
         self.assertEqual(assignments[0]["effort"], "medium")
         self.assertTrue(all(item["fast_lane"] for item in assignments))
         speed = build_speed_plan(task, assignments)

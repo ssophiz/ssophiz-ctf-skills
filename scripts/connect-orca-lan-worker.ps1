@@ -44,4 +44,4 @@ if ($RemoteRepoPath) {
 }
 
 Write-Host "Remote worker '$Name' is ready."
-Write-Host "Example: orca orchestration worker-start --task <task_id> --on $Name --worktree new-top-level --repo name:ssophiz-ctf-skills --agent codex --model gpt-5.6-sol --effort xhigh --name <worker-name> --json"
+Write-Host "Example: orca orchestration worker-start --task <task_id> --on $Name --worktree new-top-level --repo name:ssophiz-ctf-skills --agent codex --model gpt-6-astra --effort xhigh --name <worker-name> --json"

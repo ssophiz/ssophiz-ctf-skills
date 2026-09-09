@@ -10,8 +10,8 @@ class OrcaPlanTests(unittest.TestCase):
     def setUp(self) -> None:
         self.task = TaskEnvelope.create(name="demo", category="pwn", description="buffer overflow", workspace="C:/tmp/task")
         self.assignments = [
-            {"profile": "triage", "adapter": "orca", "agent": "codex", "model": "gpt-5.6-sol", "effort": "high", "role": "pwn", "focus": "triage", "wave": 0},
-            {"profile": "exploit", "adapter": "orca", "agent": "codex", "model": "gpt-5.6-sol", "effort": "xhigh", "role": "pwn", "focus": "exploit", "wave": 0},
+            {"profile": "triage", "adapter": "orca", "agent": "codex", "model": "gpt-6-astra", "effort": "high", "role": "pwn", "focus": "triage", "wave": 0},
+            {"profile": "exploit", "adapter": "orca", "agent": "codex", "model": "gpt-6-astra", "effort": "xhigh", "role": "pwn", "focus": "exploit", "wave": 0},
             {"profile": "review", "adapter": "openai_compatible", "model": "x", "role": "pwn", "focus": "review", "wave": 1},
         ]
 
