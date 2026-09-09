@@ -5,15 +5,11 @@ description: Coordinate authorized CTF tasks across specialist workers, preservi
 
 # CTF orchestrator
 
-Treat the task contract as the complete authorization boundary. First normalize the challenge, list artifacts and endpoints, then dispatch the smallest useful set of specialists.
+Treat the task contract as the complete authorization boundary. First normalize the challenge, list artifacts and endpoints, then route with `ctf-router`. Routing must remain shallow: deterministic signals first, at most two tiny probes on ambiguity, and no deep reasoning merely to decide which specialist to launch.
 
 For live-event ownership, worker states, evidence minimums, failover, and reassignment rules, read [references/live-event-operations.md](references/live-event-operations.md).
 
 Use `ctf-control` to record decisions and evidence. Use `ctf-artifact` to inspect or share task-scoped files. Browser access is for the supplied CTF platform or endpoints only; capture a screenshot or source excerpt when it materially changes routing.
-
-Use `ctf-state-capsule` at every phase boundary. Do not replay full worker transcripts into a new model. Start the next worker from the challenge statement, a five-line state capsule, and only the raw evidence spans it explicitly requests. Keep at most three active hypotheses after triage and two during an ordinary solve wave. Require each hypothesis to name one cheap falsification experiment.
-
-Apply `config/token-budget.yaml` as a soft budget. Prefer deterministic extraction, exact search, parsing, emulation, replay, and bounded retrieval before spending reasoning tokens. Escalate only when the current state capsule contains a concrete blocker. Stop duplicate workers as soon as one path has reproducible evidence.
 
 During the event, require each solver to call `record_evidence` with only the decisive commands, workspace-relative PoC paths, short key output, candidate flags, and ordered reproduction steps. Do not ask workers for prose write-ups. At event close, run `ctf-harness evidence-pdf` once to batch the per-challenge ledger into the final PDF.
 
@@ -22,5 +18,7 @@ Keep Pwn, Reverse, and Web work independent until a concrete handoff exists. Exa
 Route explicit real-time browser games, WebSocket or SSE state machines, served-bundle recovery, server-paced simulations, and request-order races to `ctf-realtime-web-game`. It owns the browser-to-direct-client transition and local hot loop; generic Web work should not duplicate that loop.
 
 Do not run analysis commands directly from this role, request verifier access, or submit flags. A candidate needs an attached reproduction path before it moves to verifier review.
+
+At each phase boundary, replace accumulated prose history with a compact `ctf-state-capsule` plus evidence paths. Preserve raw exact values in workspace evidence rather than summaries.
 
 At event close, hand the evidence ledger and final write-up to `ctf-postmortem` for private reconciliation and public-safe skill distillation.
