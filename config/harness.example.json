@@ -53,6 +53,26 @@
       "wave": 2,
       "focus": "Escalation worker. Read existing findings and artifacts before acting, resolve the recorded blocker, and avoid repeating completed triage. Build a minimal reproducible solver or exploit."
     },
+    "zai_probe": {
+      "adapter": "openai_compatible",
+      "base_url": "${ZAI_BASE_URL}",
+      "api_key_env": "ZAI_API_KEY",
+      "model": "${ZAI_MODEL}",
+      "role": "misc",
+      "wave": 0,
+      "max_turns": 4,
+      "focus": "Cheap secondary probe only. Inspect the compact state capsule and requested evidence span, test one hypothesis, and return one evidence-backed finding or BLOCKED. Do not replay the full task history."
+    },
+    "zai_review": {
+      "adapter": "openai_compatible",
+      "base_url": "${ZAI_BASE_URL}",
+      "api_key_env": "ZAI_API_KEY",
+      "model": "${ZAI_MODEL}",
+      "role": "misc",
+      "wave": 2,
+      "max_turns": 8,
+      "focus": "Independent second-model review for a concrete blocker or candidate. Read only the state capsule and explicitly referenced evidence. Prefer falsification and cross-checking over duplicate solving."
+    },
     "ollama_local": {
       "adapter": "ollama",
       "base_url": "http://127.0.0.1:11434/v1",
@@ -78,14 +98,25 @@
   },
   "failover": {
     "enabled": false,
-    "routes": {}
+    "routes": {
+      "pwn": ["zai_probe"],
+      "reverse": ["zai_probe"],
+      "malware": ["zai_probe"],
+      "web": ["zai_probe"],
+      "crypto": ["zai_probe"],
+      "forensics": ["zai_probe"],
+      "misc": ["zai_probe"]
+    }
   },
   "mcp_roles": {
-    "orchestrator": ["ctf-control", "ctf-artifact", "ctf-web"],
+    "orchestrator": ["ctf-control", "ctf-artifact"],
     "pwn": ["ctf-control", "ctf-artifact", "ctf-sandbox", "ctf-ida"],
-    "reverse": ["ctf-control", "ctf-artifact", "ctf-sandbox", "ctf-ida", "search"],
-    "malware": ["ctf-control", "ctf-artifact", "ctf-sandbox", "ctf-ida", "search"],
+    "reverse": ["ctf-control", "ctf-artifact", "ctf-sandbox", "ctf-ida"],
+    "malware": ["ctf-control", "ctf-artifact", "ctf-sandbox", "ctf-ida"],
     "web": ["ctf-control", "ctf-artifact", "ctf-sandbox", "ctf-web"],
+    "crypto": ["ctf-control", "ctf-artifact", "ctf-sandbox"],
+    "forensics": ["ctf-control", "ctf-artifact", "ctf-sandbox"],
+    "misc": ["ctf-control", "ctf-artifact", "ctf-sandbox"],
     "verifier": ["ctf-verifier"]
   }
 }
