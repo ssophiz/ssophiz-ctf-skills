@@ -1,0 +1,50 @@
+version: 1
+policy: token-efficient-ctf
+
+# Soft budgets. Exact exploit evidence is never truncated or rewritten.
+phases:
+  triage:
+    max_input_tokens: 1200
+    max_output_tokens: 500
+    max_tool_calls: 6
+    max_hypotheses: 3
+  solve:
+    max_input_tokens: 3500
+    max_output_tokens: 1200
+    max_tool_calls: 14
+    max_hypotheses: 2
+  escalate:
+    max_input_tokens: 7000
+    max_output_tokens: 2200
+    max_tool_calls: 24
+    max_hypotheses: 3
+
+handoff:
+  max_lines: 5
+  fields:
+    - status
+    - finding
+    - evidence
+    - candidate
+    - next
+
+retrieval:
+  exact_first: true
+  max_files: 5
+  max_snippet_lines: 14
+  attack_memory_cards: 3
+
+stop_rules:
+  stop_duplicate_workers_on_reproducible_evidence: true
+  require_concrete_blocker_before_escalation: true
+  prohibit_full_history_handoff: true
+  prohibit_full_repository_dump: true
+
+metrics:
+  - solved
+  - total_input_tokens
+  - total_output_tokens
+  - tokens_per_flag
+  - wall_clock_seconds
+  - tool_calls
+  - hypothesis_attempts
